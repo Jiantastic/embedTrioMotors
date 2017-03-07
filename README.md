@@ -1,5 +1,7 @@
 # embedTrioMotors
 
+MCU Nucleo board: https://developer.mbed.org/platforms/ST-Nucleo-F303K8/
+
 ## To-do-list:
 
 Q [answered]: actively listening to serial port with or w/o interrupt for regex command: yes; sequential command: execute the latest cmd. 
