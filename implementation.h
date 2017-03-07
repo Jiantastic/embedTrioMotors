@@ -43,33 +43,37 @@ const int8_t stateMap[] = {0x07,0x05,0x03,0x04,0x01,0x00,0x02,0x07};
 const int8_t lead = -2;  //2 for forwards, -2 for backwards
 
 //Status LED
-DigitalOut led1(LED1);
+extern DigitalOut led1;
 
 //Photointerrupter inputs
-DigitalIn I1(I1pin);
-DigitalIn I2(I2pin);
-DigitalIn I3(I3pin);
+extern DigitalIn I1;
+extern DigitalIn I2;
+extern DigitalIn I3;
 
 // UNCOMMENT : Incremental encoder inputs
 // DigitalIn CHAInput(CHA);
 // DigitalIn CHBInput(CHB);
 
 //Motor Drive outputs
-DigitalOut L1L(L1Lpin);
-DigitalOut L1H(L1Hpin);
-DigitalOut L2L(L2Lpin);
-DigitalOut L2H(L2Hpin);
-DigitalOut L3L(L3Lpin);
-DigitalOut L3H(L3Hpin);
+extern DigitalOut L1L;
+extern DigitalOut L1H;
+extern DigitalOut L2L;
+extern DigitalOut L2H;
+extern DigitalOut L3L;
+extern DigitalOut L3H;
 
 void inputHandler();
 void rotationHandler();
 void controlAlgorithm();
 void musicHandler();
 void motorOut(int8_t driveState);
-inline int8_t readRotorState();
 void readPositionEncoderState();
 int8_t motorHome();
+
+//Convert photointerrupter inputs to a rotor state, 1 2 and 4 and binary powers
+inline int8_t readRotorState(){
+    return stateMap[I1 + 2*I2 + 4*I3];
+}
 
 
 #endif

@@ -1,11 +1,10 @@
 #include "mbed.h"
 #include "rtos.h"
-#include "QEI.h"
 #include "implementation.h"
 
 // NOTE : when to use inline for functions?
 // use volatile for information accessed by multiple threads, mutex handler to prevent race conditions
-    
+
 //Main
 int main() {
     int8_t orState = 0;    //Rotot offset at motor state 0
@@ -30,4 +29,5 @@ int main() {
         }
     }
 }
+
 

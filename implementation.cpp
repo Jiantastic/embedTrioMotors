@@ -1,7 +1,26 @@
 #include "mbed.h"
 #include "rtos.h"
-#include "QEI.h"
 #include "implementation.h"
+
+//Status LED
+DigitalOut led1(LED1);
+
+//Photointerrupter inputs
+DigitalIn I1(I1pin);
+DigitalIn I2(I2pin);
+DigitalIn I3(I3pin);
+
+// UNCOMMENT : Incremental encoder inputs
+// DigitalIn CHAInput(CHA);
+// DigitalIn CHBInput(CHB);
+
+//Motor Drive outputs
+DigitalOut L1L(L1Lpin);
+DigitalOut L1H(L1Hpin);
+DigitalOut L2L(L2Lpin);
+DigitalOut L2H(L2Hpin);
+DigitalOut L3L(L3Lpin);
+DigitalOut L3H(L3Hpin);
 
 void inputHandler(){
     // SLRE regex handlers, use capturing groups to get necessary data
@@ -47,10 +66,6 @@ void motorOut(int8_t driveState){
     if (driveOut & 0x20) L3H = 0;
 }
     
-//Convert photointerrupter inputs to a rotor state, 1 2 and 4 and binary powers
-inline int8_t readRotorState(){
-    return stateMap[I1 + 2*I2 + 4*I3];
-}
 
 void readPositionEncoderState(){
     // QEI API 
