@@ -1,6 +1,6 @@
 # embedTrioMotors
 
-## Provisional To-do-list:
+## To-do-list:
 
 1. Turn the polling loop into interrupt-controlled loop 
 
@@ -10,7 +10,7 @@
   
 3. Set-up static (and adaptive) PD, PID controller loop in mbed
   3.1 How to determine the optimal K(s) (too large causing unstable system: root locus analysis, too small: take longer time to settle on         the desired velocity etc)
-  3.2 Adaptive control implementation
+  3.2 Adaptive control implementation (Overdamped response is required)
   
 4. Melody handler
 
