@@ -2,9 +2,9 @@
 
 ## To-do-list:
 
-### motor will spin for a defined number of rotations and stop without overshooting. (PWM controlled torque?)
+Spec 1: motor will spin for a defined number of rotations and stop without overshooting. (PWM controlled torque?)
 
-### motor will spin at a defined angular velocity, either continuously or as a maximum while carrying out specification 1. (accessing the time interval?)
+Spec 2: motor will spin at a defined angular velocity, either continuously or as a maximum while carrying out specification 1. (accessing the time interval?)
 
 1. Turn the polling loop into interrupt-controlled loop 
 
