@@ -2,6 +2,10 @@
 
 ## To-do-list:
 
+### motor will spin for a defined number of rotations and stop without overshooting. (PWM controlled torque?)
+
+### motor will spin at a defined angular velocity, either continuously or as a maximum while carrying out specification 1. (accessing the time interval?)
+
 1. Turn the polling loop into interrupt-controlled loop 
 
 2. Integrate the Quadrature Encoder Interface(QEI) codes into mbed and determine the formula for calculating the average or instantenous angle (position) and angular velocity.
@@ -9,6 +13,8 @@
   2.1 How to determine the time taken to complete a certain number of rotation: for evaluating the velocity
   
   2.2 Pulsecount or computed angle over time interval? 
+  
+ 
   
   
 3. Set-up static (and adaptive) PD, PID controller loop in mbed
