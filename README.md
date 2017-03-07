@@ -2,7 +2,13 @@
 
 ## To-do-list:
 
-Q: actively listening to serial port using interrupt for regex command; sequential command (or with thread) ? CW3?!!!
+Q: actively listening to serial port using interrupt for regex command; sequential command (or with thread) ? 
+
+polling or interrupt-driven serial ports:
+https://docs.mbed.com/docs/mbed-os-api-reference/en/latest/APIs/interfaces/digital/Serial/
+
+Do we need to use any ADC or DAC processing on the MCU (for controlling FETS using the outputs)?
+
 
 Spec 1: motor will spin for a defined number of rotations and stop without overshooting. (PWM controlled torque?)
 
