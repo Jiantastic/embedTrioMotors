@@ -9,9 +9,10 @@
   
   
 3. Set-up static (and adaptive) PD, PID controller loop in mbed
-  3.1 How to determine the optimal K(s) (too large causing unstable system: root locus analysis, too small: take longer time to settle on         the desired velocity etc), stability analysis in the report
+  3.1 How to determine the optimal range of K(s) (too large causing unstable system: root locus analysis, too small: take longer time to         settle on the desired velocity etc), stability analysis in the report: how to achieve fast performance without overshooting and
+      oscillating.
   3.2 Adaptive control implementation (Overdamped response is required)
-  3.3 PWM implementation: duty cycle (on and off time)
+  3.3 PWM implementation: duty cycle (controllig the MOSFETS on and off time)
   3.4 Re-sinking the optical disc
   
 4. Melody handler
