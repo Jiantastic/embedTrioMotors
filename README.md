@@ -2,6 +2,8 @@
 
 ## To-do-list:
 
+Q: actively listening to serial port using interrupt for regex command; sequential command (or with thread) ? CW3?!!!
+
 Spec 1: motor will spin for a defined number of rotations and stop without overshooting. (PWM controlled torque?)
 
 Spec 2: motor will spin at a defined angular velocity, either continuously or as a maximum while carrying out specification 1. (accessing the time interval?)
