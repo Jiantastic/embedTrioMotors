@@ -43,6 +43,8 @@ int main(){
     controller.setProcessValue(pv.read());
     //Set the new co controller output between outmin and outmax (0 and 3V)
     co = controller.getRealOutput(); //compute function in the header file is called to perform PID calc
+    // ^might be wrong because getrealoutput cant be found in PID.cpp and PID.h so replace it with:
+    //co = controller.compute(); 
     // add code here for feeding the co aka pwm to the mosfets to change the rotor state accordingly using motorout(): howwwww?
     //Wait for another loop calculation.
     wait(RATE);
