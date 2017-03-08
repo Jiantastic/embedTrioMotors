@@ -69,6 +69,7 @@ void motorOut(int8_t driveState){
     if (driveOut & 0x20) L3H = 0;
 }
 
+//orState = motorhome();
 int8_t orState;
 int8_t intState;
 int8_t intStateOld;
