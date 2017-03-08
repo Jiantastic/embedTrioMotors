@@ -8,8 +8,11 @@ PID::PID(float Kc, float tauI, float tauD, float interval) {
     //Default the limits to the full range of I/O: 3.3V
     //Make sure to set these to more appropriate limits for
     //your application.
+    //!!!!!!!!!!!!change this!!!!!!!!!!
     setInputLimits(0.0, 3.3);
     setOutputLimits(0.0, 3.3);
+    //setInputLimits(0.0, 117.0); // 117 is the max pulsecount per rotation
+    //setOutputLimits(0.0, 3.0);  //Vmotor = 3V
  
     tSample_ = interval;
  
