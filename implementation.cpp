@@ -22,6 +22,9 @@ DigitalOut L2H(L2Hpin);
 DigitalOut L3L(L3Lpin);
 DigitalOut L3H(L3Hpin);
 
+// serial config
+Serial pc(SERIAL_TX, SERIAL_RX);
+
 void inputHandler(){
     // SLRE regex handlers, use capturing groups to get necessary data
     // if music command -> musicHandler()
@@ -64,6 +67,19 @@ void motorOut(int8_t driveState){
     if (driveOut & 0x08) L2H = 0;
     if (driveOut & 0x10) L3L = 1;
     if (driveOut & 0x20) L3H = 0;
+}
+
+int8_t orState;
+int8_t intState;
+int8_t intStateOld;
+
+// sample photointerrupter output via interrupt
+void readPhotoInterrupterState(){
+    intState = readRotorState();
+    if (intState != intStateOld) {
+        intStateOld = intState;
+        motorOut((intState-orState+lead+6)%6); //+6 to make sure the remainder is positive
+    }
 }
     
 

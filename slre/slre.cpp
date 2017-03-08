@@ -435,5 +435,3 @@ int slre_match(const char *regexp, const char *s, int s_len,
   DBG(("========================> [%s] [%.*s]\n", regexp, s_len, s));
   return foo(regexp, (int) strlen(regexp), s, s_len, &info);
 }
-
-

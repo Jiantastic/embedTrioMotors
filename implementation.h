@@ -69,11 +69,24 @@ void musicHandler();
 void motorOut(int8_t driveState);
 void readPositionEncoderState();
 int8_t motorHome();
+void readPhotoInterrupterState();
+
+// serial config
+extern Serial pc;
 
 //Convert photointerrupter inputs to a rotor state, 1 2 and 4 and binary powers
 inline int8_t readRotorState(){
     return stateMap[I1 + 2*I2 + 4*I3];
 }
+
+// use a thread to read from serial port
+inline void readFromSerial(){
+
+}
+
+extern int8_t orState;
+extern int8_t intState;
+extern int8_t intStateOld;
 
 
 #endif

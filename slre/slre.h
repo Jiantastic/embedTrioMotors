@@ -58,5 +58,3 @@ enum { SLRE_IGNORE_CASE = 1 };
 #endif
 
 #endif /* CS_SLRE_SLRE_H_ */
-
-

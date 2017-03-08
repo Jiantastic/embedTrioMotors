@@ -5,14 +5,19 @@
 // NOTE : when to use inline for functions?
 // use volatile for information accessed by multiple threads, mutex handler to prevent race conditions
 
+// TODO
+// 1. Interrupts instead of polling for photointerrupters
+// 2. Thread(semi-polling)/Interrupt for reading from Serial input
+
+Ticker samplePhotoInterrupter;
+
 //Main
 int main() {
-    int8_t orState = 0;    //Rotot offset at motor state 0
     
-    //Initialise the serial port
-    Serial pc(SERIAL_TX, SERIAL_RX);
-    int8_t intState = 0;
-    int8_t intStateOld = 0;
+    orState = 0;
+    intState = 0;
+    intStateOld = 0;
+
     pc.printf("Hello\n\r");
     
     //Run the motor synchronisation
@@ -21,12 +26,9 @@ int main() {
     //orState is subtracted from future rotor state inputs to align rotor and motor states
     
     //Poll the rotor state and set the motor outputs accordingly to spin the motor
+    samplePhotoInterrupter.attach(&readPhotoInterrupterState,0.001);
     while (1) {
-        intState = readRotorState();
-        if (intState != intStateOld) {
-            intStateOld = intState;
-            motorOut((intState-orState+lead+6)%6); //+6 to make sure the remainder is positive
-        }
+        pc.printf("interrupt is getting called");
     }
 }
 
