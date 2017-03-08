@@ -9,7 +9,7 @@ Q [answered]: actively listening to serial port with or w/o interrupt for regex 
 polling or interrupt-driven serial ports:
 https://docs.mbed.com/docs/mbed-os-api-reference/en/latest/APIs/interfaces/digital/Serial/
 
-Q [unsolved]: Do we need to use any ADC or DAC processing on the MCU (for controlling FETS using the outputs)?
+Q [unsolved]: Do we need to use any ADC or DAC processing on the MCU (for controlling FETS using the PWM outputs from PID)?
 
 
 Spec 1: motor will spin for a defined number of rotations and stop without overshooting. (PWM controlled torque?)
@@ -22,7 +22,7 @@ Spec 2: motor will spin at a defined angular velocity, either continuously or as
 
   2.1 How to determine the time taken to complete a certain number of rotation: for evaluating the velocity
   
-  2.2 Pulsecount or computed angle over time interval? 
+  2.2 Position metrics: Pulsecount or computed angle over time interval? (to be fed into the PID)
   
   
 3. Set-up static (and adaptive) PD, PID controller loop in mbed
@@ -36,7 +36,7 @@ Spec 2: motor will spin at a defined angular velocity, either continuously or as
     
     3.3.1 Feed the controller's PWM output into one of the Nucleo's GPIO pin and to the motor PCB 
   
-  3.4 Re-sinking the optical disc
+  3.4 Re-syncing the optical disc
   
 4. Melody handler
 
