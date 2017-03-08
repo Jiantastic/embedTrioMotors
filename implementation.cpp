@@ -10,9 +10,9 @@ DigitalIn I1(I1pin);
 DigitalIn I2(I2pin);
 DigitalIn I3(I3pin);
 
-// UNCOMMENT : Incremental encoder inputs
-// DigitalIn CHAInput(CHA);
-// DigitalIn CHBInput(CHB);
+
+DigitalOut CHAInput(CHA);
+DigitalOut CHBInput(CHB);
 
 //Motor Drive outputs
 DigitalOut L1L(L1Lpin);
@@ -26,11 +26,25 @@ DigitalOut L3H(L3Hpin);
 Serial pc(SERIAL_TX, SERIAL_RX);
 
 void inputHandler(){
+    
+    char input[256] = "";
+    char c;
+    int index = 0;
+    
+    do{
+        c = pc.getc();
+        input[index++] = c;
+    }while(c != '/n');
+    
+    pc.printf("input is : %s",input);
+    
+    // IMPORTANT : I think semaphores should be used to wake up sleeping threads to do their tasks, investigate this more - THREAD SIGNAL WAIT
+    // IMPORTANT : Threads should sleep after completing its task! - refer to thread state diagram
     // SLRE regex handlers, use capturing groups to get necessary data
-    // if music command -> musicHandler()
-    // if rotation command -> rotationHandler()
-    // threads for inputHandler(),rotationHandler() and musicHandler()?
-    // interrupts for sampling photointerrupter and position encoder information
+    // if music command -> thread to musicHandler()
+    // if rotation command -> thread to rotationHandler(), different types of rotation - R, V, R-V 
+    // threads for inputHandler(),rotationHandler() and musicHandler(), threads should sleep if not doing work - refer to thread state diagram
+    // interrupts for sampling photointerrupter and position encoder information - provisionally DONE
 }
 
 void rotationHandler(){
@@ -69,10 +83,9 @@ void motorOut(int8_t driveState){
     if (driveOut & 0x20) L3H = 0;
 }
 
-//orState = motorhome();
-int8_t orState;
-int8_t intState;
-int8_t intStateOld;
+int8_t orState = motorHome();
+int8_t intState = 0;
+int8_t intStateOld = 0;
 
 // sample photointerrupter output via interrupt
 void readPhotoInterrupterState(){

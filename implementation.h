@@ -62,6 +62,10 @@ extern DigitalOut L2H;
 extern DigitalOut L3L;
 extern DigitalOut L3H;
 
+//Position Encoder outputs
+extern DigitalOut CHAInput;
+extern DigitalOut CHBInput;
+
 void inputHandler();
 void rotationHandler();
 void controlAlgorithm();
