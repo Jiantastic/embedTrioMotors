@@ -28,7 +28,7 @@ int main() {
     sampleRPM.attach(&getRPMFromPositionEncoder,RPM_SAMPLING_RATE);
     
     while (1) {
-        pc.printf("Current RPM speed value is: %i\n", currentRPMValue);
+        pc.printf("Current RPM speed value is: %f\n", currentRPMValue);
     }
     
     
