@@ -32,7 +32,7 @@ Spec 2: motor will spin at a defined angular velocity, either continuously or as
       
   3.2 PID K tuning: Adaptive control implementation (Overdamped response is required) using step test:                      https://developer.mbed.org/cookbook/PID
   
-  3.3 PWM implementation: duty cycle (controllig the MOSFETS on and off time)
+  3.3 PWM implementation: duty cycle (controllig the MOSFETS on and off time but how )
     
     3.3.1 Feed the controller's PWM output into one of the Nucleo's GPIO pin and to the motor PCB 
   
