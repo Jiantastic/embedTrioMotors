@@ -2,7 +2,7 @@
 #include "rtos.h"
 #include "QEI.h"
 #include "implementation.h"
-
+#include "PID.h"
 // NOTE : when to use inline for functions?
 // use volatile for information accessed by multiple threads, mutex handler to prevent race conditions
 
@@ -29,6 +29,8 @@ int main() {
     while (1) {
         pc.printf("No Revolutions is: %i\n", wheel.getPulses()/117 );
     }
+    
+    
 }
 
 
