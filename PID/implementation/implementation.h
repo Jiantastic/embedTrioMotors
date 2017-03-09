@@ -212,43 +212,43 @@ private:
     bool inAuto;
 
     //Actual tuning parameters used in PID calculation.
-    float Kc_;
-    float tauR_;
-    float tauD_;
+    extern float Kc_;
+    extern float tauR_;
+    extern float tauD_;
 
     //Raw tuning parameters.
-    float pParam_;
-    float iParam_;
-    float dParam_;
+    extern float pParam_;
+    extern float iParam_;
+    extern float dParam_;
 
     //The point we want to reach.
-    float setPoint_;
+    extern float setPoint_;
     //The thing we measure.
-    float processVariable_;
-    float prevProcessVariable_;
+    extern float processVariable_;
+    extern float prevProcessVariable_;
     //The output that affects the process variable.
-    float controllerOutput_;
-    float prevControllerOutput_;
+    extern float controllerOutput_;
+    extern float prevControllerOutput_;
 
     //We work in % for calculations so these will scale from
     //real world values to 0-100% and back again.
-    float inMin_;
-    float inMax_;
-    float inSpan_;
-    float outMin_;
-    float outMax_;
-    float outSpan_;
+    extern float inMin_;
+    extern float inMax_;
+    extern float inSpan_;
+    extern float outMin_;
+    extern float outMax_;
+    extern float outSpan_;
 
     //The accumulated error, i.e. integral.
-    float accError_;
+    extern float accError_;
     //The controller output bias.
-    float bias_;
+    extern float bias_;
 
     //The interval between samples.
-    float tSample_;
+    extern float tSample_;
 
     //Controller output as a real world value.
-    volatile float realOutput_;
+    extern volatile float realOutput_;
 
 };
 
