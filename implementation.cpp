@@ -25,6 +25,9 @@ DigitalOut L3H(L3Hpin);
 // serial config
 Serial pc(SERIAL_TX, SERIAL_RX);
 
+// QEI config
+QEI wheel (CHA, CHB, NC, 117);
+
 void inputHandler(){
     
     char input[256] = "";
@@ -54,6 +57,7 @@ void rotationHandler(){
 
 void controlAlgorithm(){
     // control theory!
+
 }
 
 void musicHandler(){
@@ -97,8 +101,18 @@ void readPhotoInterrupterState(){
 }
     
 
-void readPositionEncoderState(){
-    // QEI API 
+// we need to store 2 global states, lastPosition and currentPosition
+
+const float RPM_SAMPLING_RATE = 0.1;      // rate at which interrupt is called, also the time difference(t) since the last interrupt call
+float lastPosition = 0;
+float currentPosition = 0;
+float currentRPMValue = 0;
+// calls interrupt at sampling rate of samplingRateRPM -> calculate RPM with position encoder
+void getRPMFromPositionEncoder(){
+    lastPosition = currentPosition;
+    currentPosition = wheel.getPulses();
+    float numberOfRevolutions = (currentPosition - lastPosition) / 117;
+    currentRPMValue = (numberOfRevolutions / RPM_SAMPLING_RATE) * 60;
 }
 
 //Basic synchronisation routine    

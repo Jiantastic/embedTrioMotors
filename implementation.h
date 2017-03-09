@@ -74,9 +74,13 @@ void motorOut(int8_t driveState);
 void readPositionEncoderState();
 int8_t motorHome();
 void readPhotoInterrupterState();
+void getRPMFromPositionEncoder();
 
 // serial config
 extern Serial pc;
+
+// QEI position encoder config
+extern QEI wheel;
 
 //Convert photointerrupter inputs to a rotor state, 1 2 and 4 and binary powers
 inline int8_t readRotorState(){
@@ -92,5 +96,10 @@ extern int8_t orState;
 extern int8_t intState;
 extern int8_t intStateOld;
 
+// global states for calculating RPM with position encoder
+extern float lastPosition;
+extern float currentPosition;
+const extern float RPM_SAMPLING_RATE;
+extern float currentRPMValue;
 
 #endif

@@ -12,7 +12,7 @@
 // 3. Get QEI library working with pins - WORKING, more testing needed to determine accuracy - probably need to add a sync component with photointerrupters
 
 Ticker samplePhotoInterrupter;
-QEI wheel (CHA, CHB, NC, 117);
+Ticker sampleRPM;
 
 //Main
 int main() {
@@ -25,9 +25,10 @@ int main() {
     
     //Interrupt to get rotor state and set the motor outputs accordingly to spin the motor
     samplePhotoInterrupter.attach(&readPhotoInterrupterState,0.001);
+    sampleRPM.attach(&getRPMFromPositionEncoder,RPM_SAMPLING_RATE);
     
     while (1) {
-        pc.printf("No Revolutions is: %i\n", wheel.getPulses()/117 );
+        pc.printf("Current RPM speed value is: %i\n", currentRPMValue);
     }
 }
 
