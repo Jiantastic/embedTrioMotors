@@ -4,10 +4,11 @@
 #include "implementation.h"
 #include "PID.h"
 
-#define RATE 0.1 //interval at which PID outputs its PWM
+#define RATE 0.1 //interval at which PID outputs its PWM every 100ms
 // NOTE : when to use inline for functions?
 // use volatile for information accessed by multiple threads, mutex handler to prevent race conditions
 
+//Kc, Ti, Td, interval
 PID controller(1.0, 0.0, 0.0, RATE);
 //pv is the process value: pulse count or angle computed from the QEI output
 AnalogIn pv(p15);
