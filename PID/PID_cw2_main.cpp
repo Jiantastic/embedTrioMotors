@@ -11,11 +11,10 @@ PwmOut   co(p26);
 
 int main(){
 
-  //Analog input from 0.0 to 3.3V
-  //controller.setInputLimits(0.0, 3.3);
+  // read number of rotation from regex cmd
 
-  //Analog input from 0.0 to 360 degree or 117 pulsecount?
-  controller.setInputLimits(0.0, 117.0);
+  //Analog input from 0.0 to rotation (float) * 117 pulsecount?
+  controller.setInputLimits(0.0, R*117.0);
 
   //Pwm output from 0.0 to 1.0
   //controller.setOutputLimits(0.0, 1.0);
