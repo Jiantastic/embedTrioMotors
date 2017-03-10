@@ -42,3 +42,10 @@ Spec 2: motor will spin at a defined angular velocity, either continuously or as
 
 5. Think of how to integrate the use of threadings,  interrupts (other than in QEI and photointerrupters), control interface etc.
   
+## High level
+
+3 Parts
+
+1. Thread for input commands
+2. Thread for control algorithm
+3. Interrupts for photointerrupters + position encoder
