@@ -2,6 +2,8 @@
 #define	IMPLEMENTATION_H
 
 #include "mbed.h"
+#include "QEI.h"
+#include "PID.h"
 
 //Photointerrupter input pins
 #define I1pin D2
@@ -19,9 +21,6 @@
 #define L2Hpin D6           //0x08
 #define L3Lpin D9           //0x10
 #define L3Hpin D10          //0x20
-
-//PWM output control signal from PID
-#define PWM_ctrlpin D1
 
 //Mapping from sequential drive states to motor phase outputs
 /*
@@ -84,6 +83,19 @@ extern Serial pc;
 
 // QEI position encoder config
 extern QEI wheel;
+
+// PID controller
+extern PID myPID;
+extern float Kc;
+extern float Ti;
+extern float Td;
+extern float Setpoint;
+extern float Input;
+extern float Output;
+extern PwmOut pwm1;
+extern float testOut;
+extern PwmOut pwm2;
+
 
 //Convert photointerrupter inputs to a rotor state, 1 2 and 4 and binary powers
 inline int8_t readRotorState(){

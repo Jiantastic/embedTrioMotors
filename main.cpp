@@ -2,7 +2,6 @@
 #include "rtos.h"
 #include "QEI.h"
 #include "implementation.h"
-#include "PID.h"
 // NOTE : when to use inline for functions?
 // use volatile for information accessed by multiple threads, mutex handler to prevent race conditions
 
@@ -13,22 +12,27 @@
 
 Ticker samplePhotoInterrupter;
 Ticker sampleRPM;
-
+Thread control;
 //Main
+// reading from serial input = main thread
 int main() {
 
-    pc.printf("Hello\n\r");
+    // thread that handles the control algorithm inputs
+    control.start(controlAlgorithm);
+    // pc.printf("Hello\n\r");
     
     //Run the motor synchronisation
     pc.printf("Rotor origin: %x\n\r",orState);
     //orState is subtracted from future rotor state inputs to align rotor and motor states
     
     //Interrupt to get rotor state and set the motor outputs accordingly to spin the motor
-    samplePhotoInterrupter.attach(&readPhotoInterrupterState,0.001);
+    // samplePhotoInterrupter.attach(&readPhotoInterrupterState,0.001);
+    samplePhotoInterrupter.attach(&readPhotoInterrupterState,Output/255);
     sampleRPM.attach(&getRPMFromPositionEncoder,RPM_SAMPLING_RATE);
     
     while (1) {
         pc.printf("Current RPM speed value is: %f\n", currentRPMValue);
+        wait(0.5);
     }
     
     
