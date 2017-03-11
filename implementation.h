@@ -20,6 +20,9 @@
 #define L3Lpin D9           //0x10
 #define L3Hpin D10          //0x20
 
+//PWM output control signal from PID
+#define PWM_ctrlpin D1
+
 //Mapping from sequential drive states to motor phase outputs
 /*
 State   L1  L2  L3
