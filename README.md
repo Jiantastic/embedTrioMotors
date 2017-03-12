@@ -2,6 +2,10 @@
 
 MCU Nucleo board: https://developer.mbed.org/platforms/ST-Nucleo-F303K8/
 
+Millis library - https://developer.mbed.org/teams/DFRobot/code/millis/file/736e6cc31bcd/millis.cpp
+
+Arduino PID library - https://developer.mbed.org/teams/FRDM-K64F-Code-Share/code/PID/file/316f974b7f98/PID.h
+
 ## To-do-list:
 
 Q [answered]: actively listening to serial port with or w/o interrupt for regex command: yes; sequential command: execute the latest cmd. 
