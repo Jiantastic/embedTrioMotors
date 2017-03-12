@@ -13,13 +13,14 @@
 Ticker samplePhotoInterrupter;
 Ticker sampleRPM;
 Thread control;
+char input[255];
+int charCount = 0;
 //Main
 // reading from serial input = main thread
 int main() {
 
     // thread that handles the control algorithm inputs
     control.start(controlAlgorithm);
-    // pc.printf("Hello\n\r");
     
     //Run the motor synchronisation
     pc.printf("Rotor origin: %x\n\r",orState);
@@ -31,11 +32,24 @@ int main() {
     sampleRPM.attach(&getRPMFromPositionEncoder,RPM_SAMPLING_RATE);
     
     while (1) {
-        pc.printf("Current RPM speed value is: %f\n", currentRPMValue);
-        wait(0.5);
+        if(pc.readable()){
+            do{
+                ch = pc.getc();
+                pc.putc(ch);
+                input[charCount++] = ch;
+            }while(ch != 10 && ch != 13);
+
+            // TODO: testing
+            pc.putc('\n');
+            pc.putc('\r');
+
+            // SLRE regular expression handler here - to insert code after extensive testing
+            // we call different controllers(settings or otherwise) depending on speed (fast/slow) and type (R,V,R-V)
+
+            pc.printf("Current RPM speed value is: %f\n", currentRPMValue);
+            wait(0.5);
+        }
     }
-    
-    
 }
 
 
