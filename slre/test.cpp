@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <sstream>
 #include "slre.h"
 
 using namespace std;
@@ -24,23 +25,82 @@ using namespace std;
 // ^(R-?[0-9][0-9]?[0-9]?(\\.[0-9][0-9]?)?)?(V[0-9][0-9]?[0-9]?(\\.[0-9][0-9]?[0-9]?)?)?$
 
 int main(){
-	const char *request = "R-3V1";
-	struct slre_cap caps[16];
+	// stringstream ss;
+	// string inputString = "R-3V1";
+	// string rString = "";
+	// string vString = "";
+	// int placeholderForVStringLocation = 0;
+	// // split into R and V commands - had to do this because this regex libray doesn't work with R-V optional for some reason
+	// for(int i=0;i<inputString.length();i++){
+	// 	if(inputString[i] == 'V'){
+	// 		placeholderForVStringLocation = i;
+	// 	}
+	// }
 
-	// somewhat 
-	int x = slre_match("^(R-?[0-9][0-9]?[0-9]?(\\.[0-9][0-9]?)?V[0-9][0-9]?[0-9]?(\\.[0-9][0-9]?[0-9]?)?)$",
-				request, strlen(request), caps, 10, 0);
+	// for(int i=0;i<inputString.length();i++){
+	// 	if(i < placeholderForVStringLocation){
+	// 		ss << inputString
+	// 	}
+	// 	ss << inputString[i];
+
+	// }
+
+
+	// IMPORTANT : strip whitespace before processing input!
+	const char *request = "R-322.12";
+	// music has 16 capturing groups <- test if this works!
+	struct slre_cap caps[17];
+
+
+	// R command standalone - fully functional
+	// int x = slre_match("^R(-?[0-9][0-9]?[0-9]?(\\.[0-9][0-9]?)?)$",
+	// 		request, strlen(request), caps, 10, 0);
+
+	
+	int x = slre_match("^R(-?[0-9][0-9]?[0-9]?(\\.[0-9][0-9]?)?)$",
+		request, strlen(request), caps, 10, 0);
+
+	if(x > 0){
+		const char *test = caps[0].ptr;
+		float f1;
+		f1 = atof(test);
+		cout << "value of float f1 " << f1 << endl;
+		// string s = test;
+		// cout << "value of s " << s << endl;
+		printf("Method: [%.*s], URI: [%.*s]\n",
+         caps[0].len, caps[0].ptr,
+         caps[1].len, caps[1].ptr);
+	}
+
+	// V command standalone - fully functional
+	// int x = slre_match("^V([0-9][0-9]?[0-9]?(\\.[0-9][0-9]?[0-9]?)?)$",
+	// 		request, strlen(request), caps, 10, 0);
+
+
+	// R and V command combined - tested for R-V commands (surprisingly works wtf?), also works for R commands <- buggy af but doesn't matter in our use case
+	// int x = slre_match("^R(-?[0-9][0-9]?[0-9]?(\\.[0-9][0-9]?)?V[0-9][0-9]?[0-9]?(\\.[0-9][0-9]?[0-9]?)?)$",
+	// 		request, strlen(request), caps, 10, 0);
+
+
+	
+
+	// int x = slre_match("^\\d\\d?$",
+	// 	request, strlen(request), caps, 10, 0);
+
+			
+
 
 	// int x = slre_match("^(R-?[0-9][0-9]?[0-9]?(\\.[0-9][0-9]?)?)?$",
 	// 			request, strlen(request), caps, 10, 0);
 	
 	// int x = slre_match("^(V[0-9][0-9]?[0-9]?(\\.[0-9][0-9]?[0-9]?)?)?$",
 	// 			request, strlen(request), caps, 10, 0);
-
+ 
+	// match music - I think it works fairly well, needs more testing 
 	// int x = slre_match("^T([A-G][#\\^]?[1-8])([A-G][#\\^]?[1-8])?([A-G][#\\^]?[1-8])?([A-G][#\\^]?[1-8])?([A-G][#\\^]?[1-8])?([A-G][#\\^]?[1-8])?([A-G][#\\^]?[1-8])?([A-G][#\\^]?[1-8])?([A-G][#\\^]?[1-8])?([A-G][#\\^]?[1-8])?([A-G][#\\^]?[1-8])?([A-G][#\\^]?[1-8])?([A-G][#\\^]?[1-8])?([A-G][#\\^]?[1-8])?([A-G][#\\^]?[1-8])?([A-G][#\\^]?[1-8])?$",
 	// 		request, strlen(request), caps, 16, 0);
 
-	printf("value : %d",x);
+	// printf("value : %d",x);
 
 	// if (slre_match("^(R-?[0-9][0-9]?[0-9]?(\\.[0-9][0-9]?)?)?(V[0-9][0-9]?[0-9]?(\\.[0-9][0-9]?[0-9]?)?)?$",
 	// 			request, strlen(request), caps, 10, 0) > 0) {
