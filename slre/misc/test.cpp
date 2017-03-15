@@ -47,7 +47,7 @@ int main(){
 
 
 	// IMPORTANT : strip whitespace before processing input!
-	const char *request = "R-322.12";
+	const char *request = "R32.22V122.222";
 	// music has 16 capturing groups <- test if this works!
 	struct slre_cap caps[17];
 
@@ -57,10 +57,15 @@ int main(){
 	// 		request, strlen(request), caps, 10, 0);
 
 	
-	int x = slre_match("^R(-?[0-9][0-9]?[0-9]?(\\.[0-9][0-9]?)?)$",
-		request, strlen(request), caps, 10, 0);
+	// int x = slre_match("^R(-?[0-9][0-9]?[0-9]?(\\.[0-9][0-9]?)?)$",
+	// 	request, strlen(request), caps, 10, 0);
 
-	if(x > 0){
+	// if else statement chaining slre_matches, should work fine after this
+	if(slre_match("^R(-?[0-9][0-9]?[0-9]?(\\.[0-9][0-9]?)?)$",
+		request, strlen(request), caps, 10, 0) > 0){
+
+		cout << "Group 1 - R command ONLY" << endl;
+		
 		const char *test = caps[0].ptr;
 		float f1;
 		f1 = atof(test);
@@ -71,6 +76,67 @@ int main(){
          caps[0].len, caps[0].ptr,
          caps[1].len, caps[1].ptr);
 	}
+	else if(slre_match("^V([0-9][0-9]?[0-9]?(\\.[0-9][0-9]?[0-9]?)?)$",
+			 request, strlen(request), caps, 10, 0) > 0){
+				
+		cout << "Group 2 - V command ONLY" << endl;
+	}
+	else if(slre_match("^R(-?[0-9][0-9]?[0-9]?)V([0-9][0-9]?[0-9]?)$",
+			request, strlen(request), caps, 10, 0) > 0){
+
+		
+		cout << "Group 3 - RV command, NO decimals" << endl;
+
+	}
+	else if(slre_match("^R(-?[0-9][0-9]?[0-9]?\\.[0-9][0-9]?)V([0-9][0-9]?[0-9]?)$",
+			request, strlen(request), caps, 10, 0) > 0){
+
+		
+		cout << "Group 4 - RV command, decimal for R ONLY" << endl;
+
+	}
+	else if(slre_match("^R(-?[0-9][0-9]?[0-9]?)V([0-9][0-9]?[0-9]?\\.[0-9][0-9]?[0-9]?)$",
+			request, strlen(request), caps, 10, 0) > 0){
+
+		
+		cout << "Group 5 - RV command, decimal for V ONLY" << endl;
+
+	}
+	else if(slre_match("^R(-?[0-9][0-9]?[0-9]?\\.[0-9][0-9]?)V([0-9][0-9]?[0-9]?\\.[0-9][0-9]?[0-9]?)$",
+			request, strlen(request), caps, 10, 0) > 0){
+
+		
+		cout << "Group 6 - RV command, decimal for R AND V" << endl;
+
+	}
+	else if(slre_match("^T([A-G][#\\^]?[1-8])([A-G][#\\^]?[1-8])?([A-G][#\\^]?[1-8])?([A-G][#\\^]?[1-8])?([A-G][#\\^]?[1-8])?([A-G][#\\^]?[1-8])?([A-G][#\\^]?[1-8])?([A-G][#\\^]?[1-8])?([A-G][#\\^]?[1-8])?([A-G][#\\^]?[1-8])?([A-G][#\\^]?[1-8])?([A-G][#\\^]?[1-8])?([A-G][#\\^]?[1-8])?([A-G][#\\^]?[1-8])?([A-G][#\\^]?[1-8])?([A-G][#\\^]?[1-8])?$",
+			request, strlen(request), caps, 16, 0) > 0){
+
+		cout << "Group 7 - Music!" << endl;
+		
+	}
+	else{
+		cout << "Error parsing. Please enter a valid command." << endl;
+	}
+
+
+	// ^R-?[0-9][0-9]?[0-9]?(\\.[0-9][0-9]?)?V[0-9][0-9]?[0-9]?(\\.[0-9][0-9]?[0-9]?)?$
+
+	
+
+	// few options
+	// 0. 1st and 2nd decimal doesnt exist - works fine
+	// ^R(-?[0-9][0-9]?[0-9]?)V([0-9][0-9]?[0-9]?)$
+
+	// 1. 1st decimal exist, 2nd doesnt exist - works fine
+	// ^R(-?[0-9][0-9]?[0-9]?\\.[0-9][0-9]?)V([0-9][0-9]?[0-9]?)$
+
+	// 2. 2nd decimal exist, 1st doesnt exist - works fine
+	// ^R(-?[0-9][0-9]?[0-9]?)V([0-9][0-9]?[0-9]?\\.[0-9][0-9]?[0-9]?)$
+
+	// 3. both first and second decimal exist - will hopefully work under if else loop, slightly buggy otherwise
+	// ^R(-?[0-9][0-9]?[0-9]?\\.[0-9][0-9]?)V([0-9][0-9]?[0-9]?\\.[0-9][0-9]?[0-9]?)$
+
 
 	// V command standalone - fully functional
 	// int x = slre_match("^V([0-9][0-9]?[0-9]?(\\.[0-9][0-9]?[0-9]?)?)$",
@@ -84,8 +150,8 @@ int main(){
 
 	
 
-	// int x = slre_match("^\\d\\d?$",
-	// 	request, strlen(request), caps, 10, 0);
+	// int x = slre_match("^R(-?[0-9][0-9]?[0-9]?\\.[0-9][0-9]?)V([0-9][0-9]?[0-9]?\\.[0-9][0-9]?[0-9]?)$",
+	// 	request, strlen(request), caps, 15, 0);
 
 			
 
