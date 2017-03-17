@@ -15,8 +15,9 @@
 Ticker samplePhotoInterrupter;
 Ticker sampleRPM;
 Thread control;
-Ticker sampleMotorHome;
+Ticker sampleMotorHome; //for re-sync the rotor position
 
+float ROTOR_SYNC_RATE = 2; //is the rotor sync interval dependent on the rpm etc?
 char input[255];
 int charCount = 0;
 //Main
@@ -25,16 +26,17 @@ int main() {
 
     // thread that handles the control algorithm inputs
     control.start(controlAlgorithm);
-    
+
     //Run the motor synchronisation
     pc.printf("Rotor origin: %x\n\r",orState);
     //orState is subtracted from future rotor state inputs to align rotor and motor states
-    
+
     //Interrupt to get rotor state and set the motor outputs accordingly to spin the motor
     // samplePhotoInterrupter.attach(&readPhotoInterrupterState,0.001);
     samplePhotoInterrupter.attach(&readPhotoInterrupterState,Output/255);
     sampleRPM.attach(&getRPMFromPositionEncoder,RPM_SAMPLING_RATE);
-    
+    sampleMotorHome.attach(&motorHome,ROTOR_SYNC_RATE)
+
     while (1) {
         if(pc.readable()){
             // extensive testing is needed to see if memset does what it is supposed to do
@@ -79,7 +81,7 @@ int main() {
             }
             else if(slre_match("^V([0-9][0-9]?[0-9]?(\\.[0-9][0-9]?[0-9]?)?)[\r\n]+$",
                     request, strlen(request), caps, 10, 0) > 0){
-                        
+
                 pc.printf("Group 2 - V command ONLY\n");
 
                 pc.printf("CAP 1: [%.*s], CAP 2: [%.*s]\n",
@@ -118,7 +120,7 @@ int main() {
             else if(slre_match("^R(-?[0-9][0-9]?[0-9]?\\.[0-9][0-9]?)V([0-9][0-9]?[0-9]?\\.[0-9][0-9]?[0-9]?)[\r\n]+$",
                     request, strlen(request), caps, 10, 0) > 0){
 
-                
+
                 pc.printf("Group 6 - RV command, decimal for R AND V\n");
 
                 pc.printf("CAP 1: [%.*s], CAP 2: [%.*s]\n",
@@ -148,7 +150,7 @@ int main() {
                 caps[13].len, caps[13].ptr,
                 caps[14].len, caps[14].ptr,
                 caps[15].len, caps[15].ptr);
-                
+
             }
             else{
                 pc.printf("Error parsing. Please enter a valid command.");
@@ -157,5 +159,3 @@ int main() {
         }
     }
 }
-
-

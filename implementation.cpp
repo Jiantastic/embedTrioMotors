@@ -23,7 +23,7 @@ DigitalOut L3L(L3Lpin);
 DigitalOut L3H(L3Hpin);
 
 // serial config
-Serial pc(SERIAL_TX, SERIAL_RX);
+RawSerial pc(SERIAL_TX, SERIAL_RX);
 
 // QEI config
 QEI wheel (CHA, CHB, NC, 117);
@@ -64,14 +64,14 @@ void musicHandler(){
 
 //Set a given drive state
 void motorOut(int8_t driveState){
-    
+
     //Lookup the output byte from the drive state.
     int8_t driveOut = driveTable[driveState & 0x07];
-    
+
     pwm1.period(0.02);
     pwm1.write(Output/255);
     pwm2 = 1 - pwm1;
-      
+
     //Turn off first
     if (~driveOut & 0x01) L1L = 0;
     if (~driveOut & 0x02) L1H = 1;
@@ -79,9 +79,9 @@ void motorOut(int8_t driveState){
     if (~driveOut & 0x08) L2H = 1;
     if (~driveOut & 0x10) L3L = 0;
     if (~driveOut & 0x20) L3H = 1;
-    
+
     //Then turn on
-    if (driveOut & 0x01) L1L = 1; 
+    if (driveOut & 0x01) L1L = 1;
     if (driveOut & 0x02) L1H = 0;
     if (driveOut & 0x04) L2L = 1;
     if (driveOut & 0x08) L2H = 0;
@@ -102,7 +102,7 @@ void readPhotoInterrupterState(){
         motorOut((intState-orState+lead+6)%6); //+6 to make sure the remainder is positive
     }
 }
-    
+
 
 // we need to store 2 global states, lastPosition and currentPosition
 
@@ -118,12 +118,12 @@ void getRPMFromPositionEncoder(){
     currentRPMValue = (numberOfRevolutions / RPM_SAMPLING_RATE);
 }
 
-//Basic synchronisation routine    
+//Basic synchronisation routine
 int8_t motorHome() {
     //Put the motor in drive state 0 and wait for it to stabilise
     motorOut(0);
     wait(1.0);
-    
+
     //Get the rotor state
     return readRotorState();
 }
