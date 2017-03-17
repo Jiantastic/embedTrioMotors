@@ -15,6 +15,8 @@
 Ticker samplePhotoInterrupter;
 Ticker sampleRPM;
 Thread control;
+Ticker sampleMotorHome;
+
 char input[255];
 int charCount = 0;
 //Main
