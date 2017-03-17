@@ -32,7 +32,6 @@ void rotationHandler(){
     // code to produce rotation according to controlAlgorithm(), feedback = readPositionEncoderState()
     // calls photointerrupter data readRotorState() to modify motorOut()
 }
-
 // thread that continuously updates rate at which windings are changed (in the form of interrupts)
 ****************initialisation of PID controller parameters****************
 //float PIDrate = 0.1;
