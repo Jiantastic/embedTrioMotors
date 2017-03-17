@@ -28,28 +28,6 @@ Serial pc(SERIAL_TX, SERIAL_RX);
 // QEI config
 QEI wheel (CHA, CHB, NC, 117);
 
-void inputHandler(){
-    
-    char input[256] = "";
-    char c;
-    int index = 0;
-    
-    do{
-        c = pc.getc();
-        input[index++] = c;
-    }while(c != '/n');
-    
-    pc.printf("input is : %s",input);
-    
-    // IMPORTANT : I think semaphores should be used to wake up sleeping threads to do their tasks, investigate this more - THREAD SIGNAL WAIT
-    // IMPORTANT : Threads should sleep after completing its task! - refer to thread state diagram
-    // SLRE regex handlers, use capturing groups to get necessary data
-    // if music command -> thread to musicHandler()
-    // if rotation command -> thread to rotationHandler(), different types of rotation - R, V, R-V 
-    // threads for inputHandler(),rotationHandler() and musicHandler(), threads should sleep if not doing work - refer to thread state diagram
-    // interrupts for sampling photointerrupter and position encoder information - provisionally DONE
-}
-
 void rotationHandler(){
     // code to produce rotation according to controlAlgorithm(), feedback = readPositionEncoderState()
     // calls photointerrupter data readRotorState() to modify motorOut()
@@ -76,7 +54,7 @@ void controlAlgorithm(){
         myPID.SetMode(AUTOMATIC);
         Input = currentRPMValue;
         myPID.Compute();
-        Thread::wait(0.1);
+        Thread::wait(1);
     }
 }
 

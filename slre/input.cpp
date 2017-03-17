@@ -8,16 +8,22 @@ int main(){
 	// TODO : testing this in mbed, with interrupts + use main thread while(1) scan for input
 
 	// IMPORTANT : strip whitespace before processing input!
-	const char *request = "R32.22V122.222";
+	// const char *request = "R32.22V122.222";
+
+	char test[200];
+	test[0] = 'R';
+	test[1] = '1';
+	test[2] = '0';
+	const char *request = (const char*)test;
 	// music has 16 capturing groups <- test if this works!
 	struct slre_cap caps[16];
 
-	if(slre_match("^R(-?[0-9][0-9]?[0-9]?(\\.[0-9][0-9]?)?)$",
+	if(slre_match("^R(-?[0-9][0-9]?[0-9]?(\\.[0-9][0-9]?)?)[\r\n]+$",
 		request, strlen(request), caps, 10, 0) > 0){
 
-		pc.printf("Group 1 - R command ONLY\n");
+		printf("Group 1 - R command ONLY\n");
 
-		pc.printf("Method: [%.*s], URI: [%.*s]\n",
+		printf("Method: [%.*s], URI: [%.*s]\n",
          caps[0].len, caps[0].ptr,
          caps[1].len, caps[1].ptr);
 
@@ -31,30 +37,30 @@ int main(){
         //  caps[0].len, caps[0].ptr,
         //  caps[1].len, caps[1].ptr);
 	}
-	else if(slre_match("^V([0-9][0-9]?[0-9]?(\\.[0-9][0-9]?[0-9]?)?)$",
+	else if(slre_match("^V([0-9][0-9]?[0-9]?(\\.[0-9][0-9]?[0-9]?)?)[\r\n]+$",
 			 request, strlen(request), caps, 10, 0) > 0){
 				
-		pc.printf("Group 2 - V command ONLY\n");
+		printf("Group 2 - V command ONLY\n");
 
-		pc.printf("CAP 1: [%.*s], CAP 2: [%.*s]\n",
+		printf("CAP 1: [%.*s], CAP 2: [%.*s]\n",
          caps[0].len, caps[0].ptr,
          caps[1].len, caps[1].ptr);
 	}
 	else if(slre_match("^R(-?[0-9][0-9]?[0-9]?)V([0-9][0-9]?[0-9]?)$",
 			request, strlen(request), caps, 10, 0) > 0){
 
-		pc.printf("Group 3 - RV command, NO decimals\n");
+		printf("Group 3 - RV command, NO decimals\n");
 
-		pc.printf("CAP 1: [%.*s], CAP 2: [%.*s]\n",
+		printf("CAP 1: [%.*s], CAP 2: [%.*s]\n",
          caps[0].len, caps[0].ptr,
          caps[1].len, caps[1].ptr);
 	}
 	else if(slre_match("^R(-?[0-9][0-9]?[0-9]?\\.[0-9][0-9]?)V([0-9][0-9]?[0-9]?)$",
 			request, strlen(request), caps, 10, 0) > 0){
 
-		pc.printf("Group 4 - RV command, decimal for R ONLY\n");
+		printf("Group 4 - RV command, decimal for R ONLY\n");
 
-		pc.printf("CAP 1: [%.*s], CAP 2: [%.*s]\n",
+		printf("CAP 1: [%.*s], CAP 2: [%.*s]\n",
          caps[0].len, caps[0].ptr,
          caps[1].len, caps[1].ptr);
 
@@ -62,9 +68,9 @@ int main(){
 	else if(slre_match("^R(-?[0-9][0-9]?[0-9]?)V([0-9][0-9]?[0-9]?\\.[0-9][0-9]?[0-9]?)$",
 			request, strlen(request), caps, 10, 0) > 0){
 
-		pc.printf("Group 5 - RV command, decimal for V ONLY\n");
+		printf("Group 5 - RV command, decimal for V ONLY\n");
 
-		pc.printf("CAP 1: [%.*s], CAP 2: [%.*s]\n",
+		printf("CAP 1: [%.*s], CAP 2: [%.*s]\n",
          caps[0].len, caps[0].ptr,
          caps[1].len, caps[1].ptr);
 
@@ -73,9 +79,9 @@ int main(){
 			request, strlen(request), caps, 10, 0) > 0){
 
 		
-		pc.printf("Group 6 - RV command, decimal for R AND V\n");
+		printf("Group 6 - RV command, decimal for R AND V\n");
 
-		pc.printf("CAP 1: [%.*s], CAP 2: [%.*s]\n",
+		printf("CAP 1: [%.*s], CAP 2: [%.*s]\n",
          caps[0].len, caps[0].ptr,
          caps[1].len, caps[1].ptr);
 
@@ -83,9 +89,9 @@ int main(){
 	else if(slre_match("^T([A-G][#\\^]?[1-8])([A-G][#\\^]?[1-8])?([A-G][#\\^]?[1-8])?([A-G][#\\^]?[1-8])?([A-G][#\\^]?[1-8])?([A-G][#\\^]?[1-8])?([A-G][#\\^]?[1-8])?([A-G][#\\^]?[1-8])?([A-G][#\\^]?[1-8])?([A-G][#\\^]?[1-8])?([A-G][#\\^]?[1-8])?([A-G][#\\^]?[1-8])?([A-G][#\\^]?[1-8])?([A-G][#\\^]?[1-8])?([A-G][#\\^]?[1-8])?([A-G][#\\^]?[1-8])?$",
 			request, strlen(request), caps, 16, 0) > 0){
 
-		pc.printf("Group 7 - Music!\n");
+		printf("Group 7 - Music!\n");
 
-		pc.printf("CAP 1: [%.*s], CAP 2: [%.*s], CAP 3: [%.*s], CAP 4: [%.*s], CAP 5: [%.*s], CAP 6: [%.*s], CAP 7: [%.*s], CAP 8: [%.*s], CAP 9: [%.*s], CAP 10: [%.*s], CAP 11: [%.*s], CAP 12: [%.*s], CAP 13: [%.*s], CAP 14: [%.*s], CAP 15: [%.*s], CAP 16: [%.*s]\n",
+		printf("CAP 1: [%.*s], CAP 2: [%.*s], CAP 3: [%.*s], CAP 4: [%.*s], CAP 5: [%.*s], CAP 6: [%.*s], CAP 7: [%.*s], CAP 8: [%.*s], CAP 9: [%.*s], CAP 10: [%.*s], CAP 11: [%.*s], CAP 12: [%.*s], CAP 13: [%.*s], CAP 14: [%.*s], CAP 15: [%.*s], CAP 16: [%.*s]\n",
          caps[0].len, caps[0].ptr,
          caps[1].len, caps[1].ptr,
 		 caps[2].len, caps[2].ptr,
