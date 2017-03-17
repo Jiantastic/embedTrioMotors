@@ -34,7 +34,6 @@ void rotationHandler(){
 }
 
 // thread that continuously updates rate at which windings are changed (in the form of interrupts)
-
 float PIDrate = 0.1;
 float Kc = 2.5;
 float Ti = 0.1;
