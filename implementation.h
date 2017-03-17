@@ -96,7 +96,6 @@ extern PwmOut pwm1;
 extern float testOut;
 extern PwmOut pwm2;
 
-
 //Convert photointerrupter inputs to a rotor state, 1 2 and 4 and binary powers
 inline int8_t readRotorState(){
     return stateMap[I1 + 2*I2 + 4*I3];
