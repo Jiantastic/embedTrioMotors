@@ -30,7 +30,6 @@ int main() {
     //Run the motor synchronisation
     pc.printf("Rotor origin: %x\n\r",orState);
     //orState is subtracted from future rotor state inputs to align rotor and motor states
-
     //Interrupt to get rotor state and set the motor outputs accordingly to spin the motor
     // samplePhotoInterrupter.attach(&readPhotoInterrupterState,0.001);
     samplePhotoInterrupter.attach(&readPhotoInterrupterState,Output/255);
