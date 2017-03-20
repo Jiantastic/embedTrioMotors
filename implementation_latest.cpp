@@ -33,7 +33,7 @@ void rotationHandler(){
     // calls photointerrupter data readRotorState() to modify motorOut()
 }
 // thread that continuously updates rate at which windings are changed (in the form of interrupts)
-****************initialisation of PID controller parameters****************
+// ****************initialisation of PID controller parameters****************
 //float PIDrate = 0.1;
 float Kp = 2.5; // try testing with low value
 float Ki = 0.1; //do we even need this??
@@ -42,12 +42,12 @@ float Kd = 0.1; //to be iterated
 float Setpoint = 5.1; // from regex command input
 float Input = 0; //
 float Output = 0;
-**************** we need to change these *******************
+// **************** we need to change these *******************
 PwmOut pwm1(D1);
 PwmOut pwm2(D0);
 float threshold_rpm = 33; // this threshold is used to switch the coils between PWMout mode and DigitalOut mode
 
-***************initialisation of PWM parameters*************
+// ***************initialisation of PWM parameters*************
 bool AUTOMATIC=1; // to enable the auto-tuning of PID algorithm
 float PWM_period = 127;
 float pulsewidth = 0; //initialisation of PID controller output, pulsewidth
@@ -159,9 +159,6 @@ void motorOut(int8_t driveState){
     if (driveOut & 0x08) L2H = 0;
     if (driveOut & 0x10) L3Ldigi;
     if (driveOut & 0x20) L3H = 0;
-
-
-
 }
 
 int8_t orState = motorHome(); // how often do we need to re-sync the rotor ? eg N rotations?
@@ -178,7 +175,7 @@ void readPhotoInterrupterState(duty_cycle){
         motorOut((intState-orState+lead+6)%6); //+6 to make sure the remainder is positive
         }
         if (duty_cycle < 0) { //-ve torque to slow down the spinning motor or reverse the direction
-        motorOut((intState-orState-lead+6)%6); //+6 to make sure the remainder is positive
+          motorOut((intState-orState-lead+6)%6); //+6 to make sure the remainder is positive
         }
         //orstate is updated for re-syncing the rotor position every 2s in the main.cpp by interrupt
 
