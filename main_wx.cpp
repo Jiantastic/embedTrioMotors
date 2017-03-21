@@ -73,6 +73,7 @@ DigitalIn CHBInput(CHB);
 
 //Motor Drive outputs
 DigitalOut *L1Ldigi = new DigitalOut(L1Lpin);
+<<<<<<< HEAD
 DigitalOut L1Hdigi(L1Hpin);
 //DigitalOut *L1Hdigi = new DigitalOut(L1Hpin);
 DigitalOut *L2Ldigi = new DigitalOut(L2Lpin);
@@ -88,6 +89,13 @@ PwmOut *L2Lpwm = new PwmOut(L2Lpin);
 //PwmOut *L2Hpwm = new PwmOut(L2Hpin);
 PwmOut *L3Lpwm = new PwmOut(L3Lpin);
 //PwmOut *L3Hpwm = new PwmOut(L3Hpin);
+=======
+DigitalOut *L1Hdigi = new DigitalOut(L1Hpin);
+DigitalOut *L2Ldigi = new DigitalOut(L2Lpin);
+DigitalOut *L2Hdigi = new DigitalOut(L2Hpin);
+DigitalOut *L3Ldigi = new DigitalOut(L3Lpin);
+DigitalOut *L3Hdigi = new DigitalOut(L3Hpin);
+>>>>>>> 10d1b4cb9552cf4f8c0c445dd4217cb76467df4f
 
 // QEI config
 QEI wheel(CHA, CHB, NC, 117);
