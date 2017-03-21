@@ -32,8 +32,8 @@ DigitalOut led1(LED1);
 //@@@@@@@ NEW CONSTANTS Definition @@@@@@@
 RawSerial pc(SERIAL_TX, SERIAL_RX);
 
-const float Vref = 3;
-const float Rref = 30;
+const float Vref = 5;
+const float Rref = 100;
 
 //const float thresholdRPS = 33;
 //const float periodDC = 0.01; //Set duty cycle period to 0.01s (10ms)
@@ -47,12 +47,12 @@ float lastPosition = 0;
 float currentPosition = 0;
 float currentRPSValue = 0;                // global angular velocity/RPS value
 
-float rotations=5; //Set a random starting variable - replaced by regex later on
-float targetPosition=117*Rref;
-float PIDrate = 0.1;
-float Kc = 10.0;
-float Ti = 3.0;
-float Td = 0;
+//float rotations=5; //Set a random starting variable - replaced by regex later on
+float targetPosition=117*Rref;  //30*117=3510 100*117=11700
+float PIDrate = 0.2;
+float Kc = 5.0;
+float Ti = 0.0;
+float Td = 0.0;
 float speedControl = 0;
 float dutyCycle = 0; //global duty cycle to be passed to motorOut
 bool AUTO = 1;
@@ -217,7 +217,7 @@ void getRPSfromQEI(){
 
 //------- Controller -------
 void controlInit() {
-    controller.setInputLimits(0.0,targetPosition*100);
+    controller.setInputLimits(0.0,targetPosition*50);
     controller.setOutputLimits(-1.0, 1.0); //Set duty cycle parameter as fraction
     controller.setBias(0.0);
     controller.setMode(AUTO); //SET MODE as auto
@@ -228,6 +228,7 @@ void controlR() {
     while(1) {
         controller.setProcessValue(currentPosition);
         dutyCycle = controller.compute();
+        pc.printf("Kc, Ki ,Kd: %f \t %f \t %f \r\n", controller.getPParam(), 1/controller.getIParam(), 1/controller.getDParam());
         pc.printf("duty cycle: %f \n\r", dutyCycle);
         wait(PIDrate);
     }
