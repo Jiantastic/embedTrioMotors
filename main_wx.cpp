@@ -72,12 +72,12 @@ DigitalIn CHAInput(CHA);
 DigitalIn CHBInput(CHB);
 
 //Motor Drive outputs
-DigitalOut L1Ldigi(L1Lpin);
-DigitalOut L1Hdigi(L1Hpin);
-DigitalOut L2Ldigi(L2Lpin);
-DigitalOut L2Hdigi(L2Hpin);
-DigitalOut L3Ldigi(L3Lpin);
-DigitalOut L3Hdigi(L3Hpin);
+DigitalOut *L1Ldigi = new DigitalOut(L1Lpin);
+DigitalOut *L1Hdigi = new DigitalOut(L1Hpin);
+DigitalOut *L2Ldigi = new DigitalOut(L2Lpin);
+DigitalOut *L2Hdigi = new DigitalOut(L2Hpin);
+DigitalOut *L3Ldigi = new DigitalOut(L3Lpin);
+DigitalOut *L3Hdigi = new DigitalOut(L3Hpin);
 
 // QEI config
 QEI wheel(CHA, CHB, NC, 117);
@@ -114,9 +114,7 @@ float modulus(float n) {
 //------- Set a given drive state and moves motor -------
 /*Brute force speed limitation
 void motorOut(int8_t driveState){
-
     int8_t driveOut = driveTable[driveState & 0x07];
-
     //Turn off first
     if (~driveOut & 0x01) L1L = 0;
     if (~driveOut & 0x02) L1H = 1;
@@ -124,7 +122,6 @@ void motorOut(int8_t driveState){
     if (~driveOut & 0x08) L2H = 1;
     if (~driveOut & 0x10) L3L = 0;
     if (~driveOut & 0x20) L3H = 1;
-
     //Turn on if current speed is less than reference
     if(currentRPSValue < Vref) {
         if (driveOut & 0x01) L1L = 1;
