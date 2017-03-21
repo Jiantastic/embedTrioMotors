@@ -72,12 +72,22 @@ DigitalIn CHAInput(CHA);
 DigitalIn CHBInput(CHB);
 
 //Motor Drive outputs
-DigitalOut L1Ldigi(L1Lpin);
+DigitalOut *L1Ldigi = new DigitalOut(L1Lpin);
 DigitalOut L1Hdigi(L1Hpin);
-DigitalOut L2Ldigi(L2Lpin);
+//DigitalOut *L1Hdigi = new DigitalOut(L1Hpin);
+DigitalOut *L2Ldigi = new DigitalOut(L2Lpin);
 DigitalOut L2Hdigi(L2Hpin);
-DigitalOut L3Ldigi(L3Lpin);
+//DigitalOut *L2Hdigi = new DigitalOut(L2Hpin);
+DigitalOut *L3Ldigi = new DigitalOut(L3Lpin);
 DigitalOut L3Hdigi(L3Hpin);
+//DigitalOut *L3Hdigi = new DigitalOut(L3Hpin);
+
+PwmOut *L1Lpwm = new PwmOut(L1Lpin);
+//PwmOut *L1Hpwm = new PwmOut(L1Hpin);
+PwmOut *L2Lpwm = new PwmOut(L2Lpin);
+//PwmOut *L2Hpwm = new PwmOut(L2Hpin);
+PwmOut *L3Lpwm = new PwmOut(L3Lpin);
+//PwmOut *L3Hpwm = new PwmOut(L3Hpin);
 
 // QEI config
 QEI wheel(CHA, CHB, NC, 117);
@@ -114,9 +124,7 @@ float modulus(float n) {
 //------- Set a given drive state and moves motor -------
 /*Brute force speed limitation
 void motorOut(int8_t driveState){
-
     int8_t driveOut = driveTable[driveState & 0x07];
-
     //Turn off first
     if (~driveOut & 0x01) L1L = 0;
     if (~driveOut & 0x02) L1H = 1;
@@ -124,7 +132,6 @@ void motorOut(int8_t driveState){
     if (~driveOut & 0x08) L2H = 1;
     if (~driveOut & 0x10) L3L = 0;
     if (~driveOut & 0x20) L3H = 1;
-
     //Turn on if current speed is less than reference
     if(currentRPSValue < Vref) {
         if (driveOut & 0x01) L1L = 1;
@@ -150,15 +157,15 @@ void motorOut(int8_t driveState){
         //Since we cannot set the phase of the different PWM channels we cannot synchronise both the H and L pulses to be on at the same time.
         //So leave one set with digital inputs (L1H-L3H) as before and just have PWM on the other set (L1L-L3L).
         // do we perform all the changes in n-channel Mosfet concurrently in threads or sequentially as what's being done below?
-        delete *L1Ldigi; //default pin type declared as DigitalOut upon initialisation
+        delete L1Ldigi; //default pin type declared as DigitalOut upon initialisation
         PwmOut *L1Lpwm = new PwmOut(L1Lpin);
-        L1Lpwm.period(periodDC);  //Period of pwm = 0.01seconds (10ms)
-        delete *L2Ldigi;
+        L1Lpwm->period(periodDC);  //Period of pwm = 0.01seconds (10ms)
+        delete L2Ldigi;
         PwmOut *L2Lpwm = new PwmOut(L2Lpin);
-        L2Lpwm.period(periodDC);  //Period of pwm = 0.01seconds (10ms)
-        delete *L3Ldigi;
+        L2Lpwm->period(periodDC);  //Period of pwm = 0.01seconds (10ms)
+        delete L3Ldigi;
         PwmOut *L3Lpwm = new PwmOut(L3Lpin);
-        L3Lpwm.period(periodDC);  //Period of pwm = 0.01seconds (10ms)
+        L3Lpwm->period(periodDC);  //Period of pwm = 0.01seconds (10ms)
 
         //Turn off first
         if (~driveOut & 0x01) L1Lpwm = 0;
@@ -170,11 +177,11 @@ void motorOut(int8_t driveState){
 
         //Then turn on if speed is less than reference
         if (currentRPSValue < Vref) {
-            if (driveOut & 0x01) L1Lpwm.write(modulus(dutyCycle));
+            if (driveOut & 0x01) L1Lpwm->write(modulus(dutyCycle));
             if (driveOut & 0x02) L1Hdigi = 0;
-            if (driveOut & 0x04) L2Lpwm.write(modulus(dutyCycle));
+            if (driveOut & 0x04) L2Lpwm->write(modulus(dutyCycle));
             if (driveOut & 0x08) L2Hdigi = 0;
-            if (driveOut & 0x10) L3Lpwm.write(modulus(dutyCycle));
+            if (driveOut & 0x10) L3Lpwm->write(modulus(dutyCycle));
             if (driveOut & 0x20) L3Hdigi = 0;
         }
     }
@@ -183,11 +190,11 @@ void motorOut(int8_t driveState){
         // at high motor speed the dutycycle needs to be switched quickly but there is a latency whereby duty cycle is updated and applied upon the inductors.
         // so we use DigitalOut instead of PwmOut here
         // the PwmOut has higher priority over the DigitalOut but no disable function is available in the PwmOut library so:
-        delete *L1Lpwm;
+        delete L1Lpwm;
         DigitalOut *L1Ldigi = new DigitalOut(L1Lpin);
-        delete *L2Lpwm;
+        delete L2Lpwm;
         DigitalOut *L2Ldigi = new DigitalOut(L2Lpin);
-        delete *L3Lpwm;
+        delete L3Lpwm;
         DigitalOut *L3Ldigi = new DigitalOut(L3Lpin);
 
         //Turn off first
@@ -201,11 +208,11 @@ void motorOut(int8_t driveState){
         //Then turn on if current speed is less than reference
         //[Attention] will shoot thru (short cct) occur with this configuration?
         if(currentRPSValue < Vref) {
-            if (driveOut & 0x01) L1Ldigi = 1;
+            if (driveOut & 0x01) *L1Ldigi = 1;
             if (driveOut & 0x02) L1Hdigi = 0;
-            if (driveOut & 0x04) L2Ldigi = 1;
+            if (driveOut & 0x04) *L2Ldigi = 1;
             if (driveOut & 0x08) L1Hdigi = 0;
-            if (driveOut & 0x10) L3Ldigi = 1;
+            if (driveOut & 0x10) *L3Ldigi = 1;
             if (driveOut & 0x20) L1Hdigi = 0;
         }
     }
@@ -259,7 +266,6 @@ void controlR() {
     while(1) {
         controller.setProcessValue(currentPosition);
         dutyCycle = controller.compute();
-        wait(PIDrate);
     }
 }
 
