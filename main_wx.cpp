@@ -150,14 +150,14 @@ void motorOut(int8_t driveState){
         //Since we cannot set the phase of the different PWM channels we cannot synchronise both the H and L pulses to be on at the same time.
         //So leave one set with digital inputs (L1H-L3H) as before and just have PWM on the other set (L1L-L3L).
         // do we perform all the changes in n-channel Mosfet concurrently in threads or sequentially as what's being done below?
-        delete L1Ldigi; //default pin type declared as DigitalOut upon initialisation
-        L1Lpwm = new PwmOut(L1Lpin);
+        delete *L1Ldigi; //default pin type declared as DigitalOut upon initialisation
+        PwmOut *L1Lpwm = new PwmOut(L1Lpin);
         L1Lpwm.period(periodDC);  //Period of pwm = 0.01seconds (10ms)
-        delete L2Ldigi;
-        L2Lpwm = new PwmOut(L2Lpin);
-        L2Lpwm.period(periodDC);  //Period of pwm = 0.01seconds (10ms)        
-        delete L3Ldigi;
-        L3Lpwm = new PwmOut(L3Lpin);
+        delete *L2Ldigi;
+        PwmOut *L2Lpwm = new PwmOut(L2Lpin);
+        L2Lpwm.period(periodDC);  //Period of pwm = 0.01seconds (10ms)
+        delete *L3Ldigi;
+        PwmOut *L3Lpwm = new PwmOut(L3Lpin);
         L3Lpwm.period(periodDC);  //Period of pwm = 0.01seconds (10ms)
 
         //Turn off first
@@ -166,16 +166,16 @@ void motorOut(int8_t driveState){
         if (~driveOut & 0x04) L2Lpwm = 0;
         if (~driveOut & 0x08) L1Hdigi = 1;
         if (~driveOut & 0x10) L3Lpwm = 0;
-        if (~driveOut & 0x20) L1Hdigi = 1;   
+        if (~driveOut & 0x20) L1Hdigi = 1;
 
         //Then turn on if speed is less than reference
         if (currentRPSValue < Vref) {
             if (driveOut & 0x01) L1Lpwm.write(modulus(dutyCycle));
             if (driveOut & 0x02) L1Hdigi = 0;
             if (driveOut & 0x04) L2Lpwm.write(modulus(dutyCycle));
-            if (driveOut & 0x08) L1Hdigi = 0;
+            if (driveOut & 0x08) L2Hdigi = 0;
             if (driveOut & 0x10) L3Lpwm.write(modulus(dutyCycle));
-            if (driveOut & 0x20) L1Hdigi = 0;
+            if (driveOut & 0x20) L3Hdigi = 0;
         }
     }
 
@@ -183,12 +183,12 @@ void motorOut(int8_t driveState){
         // at high motor speed the dutycycle needs to be switched quickly but there is a latency whereby duty cycle is updated and applied upon the inductors.
         // so we use DigitalOut instead of PwmOut here
         // the PwmOut has higher priority over the DigitalOut but no disable function is available in the PwmOut library so:
-        delete L1Lpwm;
-        L1Ldigi = new DigitalOut(L1Lpin);
-        delete L2Lpwm;
-        L2Ldigi = new DigitalOut(L2Lpin);
-        delete L3Lpwm;
-        L3Ldigi = new DigitalOut(L3Lpin);
+        delete *L1Lpwm;
+        DigitalOut *L1Ldigi = new DigitalOut(L1Lpin);
+        delete *L2Lpwm;
+        DigitalOut *L2Ldigi = new DigitalOut(L2Lpin);
+        delete *L3Lpwm;
+        DigitalOut *L3Ldigi = new DigitalOut(L3Lpin);
 
         //Turn off first
         if (~driveOut & 0x01) L1Ldigi = 0;
@@ -240,7 +240,7 @@ void readPIrunMotor(){
 
 //------- Speed from QEI and PI -------
 void getRPSfromQEI(){
-    lastPosition = currentPosition;     
+    lastPosition = currentPosition;
     currentPosition = wheel.getPulses();    //getPulses gets accumulated no. of pulses recorded
     float numberOfRevolutions = (currentPosition - lastPosition) / 117;
     currentRPSValue = (numberOfRevolutions / RPS_SAMPLING_RATE);
@@ -248,19 +248,19 @@ void getRPSfromQEI(){
 
 //------- Controller -------
 void controlInit() {
-    controller.setInputLimits(0.0,targetPos); 
+    controller.setInputLimits(0.0,targetPos);
     controller.setOutputLimits(-1.0, 1.0); //Set duty cycle parameter as fraction
     controller.setBias(0.0);
     controller.setMode(AUTO); //SET MODE as auto
-    controller.setSetPoint(targetPos); 
+    controller.setSetPoint(targetPos);
 }
 
 void controlR() {
     while(1) {
         controller.setProcessValue(currentPosition);
-        dutyCycle = controller.compute(); 
+        dutyCycle = controller.compute();
         wait(PIDrate);
-    } 
+    }
 }
 
 //**********************************************
@@ -269,7 +269,7 @@ void controlR() {
 int main()
 {
     //******* Initialise the serial port *******
-    Serial pc(SERIAL_TX, SERIAL_RX);
+    RawSerial pc(SERIAL_TX, SERIAL_RX);
 
     pc.printf("Hello\n\r");
 
