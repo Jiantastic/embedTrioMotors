@@ -30,11 +30,13 @@
 DigitalOut led1(LED1);
 
 //@@@@@@@ NEW CONSTANTS Definition @@@@@@@
-const float Vref = 10;
-const float Rref = 20;
+RawSerial pc(SERIAL_TX, SERIAL_RX);
 
-const float thresholdRPS = 33;
-const float periodDC = 0.01; //Set duty cycle period to 0.01s (10ms)
+const float Vref = 3;
+const float Rref = 30;
+
+//const float thresholdRPS = 33;
+//const float periodDC = 0.01; //Set duty cycle period to 0.01s (10ms)
 
 int8_t intState = 0;
 int8_t intStateOld = 0;
@@ -46,7 +48,7 @@ float currentPosition = 0;
 float currentRPSValue = 0;                // global angular velocity/RPS value
 
 float rotations=5; //Set a random starting variable - replaced by regex later on
-float targetPos=117*Rref;
+float targetPosition=117*Rref;
 float PIDrate = 0.1;
 float Kc = 10.0;
 float Ti = 3.0;
@@ -71,23 +73,47 @@ Ticker sampleRPS;
 DigitalIn CHAInput(CHA);
 DigitalIn CHBInput(CHB);
 
-//Motor Drive outputs
-DigitalOut *L1Ldigi = new DigitalOut(L1Lpin);
-DigitalOut L1Hdigi(L1Hpin);
-//DigitalOut *L1Hdigi = new DigitalOut(L1Hpin);
-DigitalOut *L2Ldigi = new DigitalOut(L2Lpin);
-DigitalOut L2Hdigi(L2Hpin);
-//DigitalOut *L2Hdigi = new DigitalOut(L2Hpin);
-DigitalOut *L3Ldigi = new DigitalOut(L3Lpin);
-DigitalOut L3Hdigi(L3Hpin);
-//DigitalOut *L3Hdigi = new DigitalOut(L3Hpin);
+// //Motor Drive outputs
+// DigitalOut *L1Ldigi = new DigitalOut(L1Lpin);
+// DigitalOut L1Hdigi(L1Hpin);
+// //DigitalOut *L1Hdigi = new DigitalOut(L1Hpin);
+// DigitalOut *L2Ldigi = new DigitalOut(L2Lpin);
+// DigitalOut L2Hdigi(L2Hpin);
+// //DigitalOut *L2Hdigi = new DigitalOut(L2Hpin);
+// DigitalOut *L3Ldigi = new DigitalOut(L3Lpin);
+// DigitalOut L3Hdigi(L3Hpin);
+// //DigitalOut *L3Hdigi = new DigitalOut(L3Hpin);
 
 PwmOut *L1Lpwm = new PwmOut(L1Lpin);
-//PwmOut *L1Hpwm = new PwmOut(L1Hpin);
+PwmOut *L1Hpwm = new PwmOut(L1Hpin);
 PwmOut *L2Lpwm = new PwmOut(L2Lpin);
-//PwmOut *L2Hpwm = new PwmOut(L2Hpin);
+PwmOut *L2Hpwm = new PwmOut(L2Hpin);
 PwmOut *L3Lpwm = new PwmOut(L3Lpin);
-//PwmOut *L3Hpwm = new PwmOut(L3Hpin);
+PwmOut *L3Hpwm = new PwmOut(L3Hpin);
+// const float periodDC = 0.01;
+// L1Lpwm->period(periodDC);
+// L1Hpwm->period(periodDC);
+// L2Lpwm->period(periodDC);
+// L2Hpwm->period(periodDC);
+// L3Lpwm->period(periodDC);
+// L3Hpwm->period(periodDC);
+
+// PwmOut L1Lpwm(L1Lpin);
+// PwmOut L1Hpwm(L1Hpin);
+// PwmOut L2Lpwm(L2Lpin);
+// PwmOut L2Hpwm(L2Hpin);
+// PwmOut L3Lpwm(L3Lpin);
+// PwmOut L3Hpwm(L3Hpin);
+
+// const float periodDC = 0.01f;
+
+// L1Lpwm.period(periodDC);
+// L1Hpwm.period(periodDC);
+// L2Lpwm.period(periodDC);
+// L2Hpwm.period(periodDC);
+// L3Lpwm.period(periodDC);
+// L3Hpwm.period(periodDC);
+
 
 // QEI config
 QEI wheel(CHA, CHB, NC, 117);
@@ -100,7 +126,7 @@ const int8_t stateMap[] = {0x07, 0x05, 0x03, 0x04, 0x01, 0x00, 0x02, 0x07};
 //const int8_t stateMap[] = {0x07,0x01,0x03,0x02,0x05,0x00,0x04,0x07}; //Alternative if phase order of input or drive is reversed
 
 //@@@@@@@ Phase lead to make motor spin @@@@@@@ Must change according to PID output value
-const int8_t lead = 2; //2 for forwards, -2 for backwards
+const int8_t lead = -2; //2 for forwards, -2 for backwards
 
 //**********************************************
 //*             Function Definitions           *
@@ -121,100 +147,34 @@ float modulus(float n) {
     }
 }
 
-//------- Set a given drive state and moves motor -------
-/*Brute force speed limitation
-void motorOut(int8_t driveState){
-    int8_t driveOut = driveTable[driveState & 0x07];
-    //Turn off first
-    if (~driveOut & 0x01) L1L = 0;
-    if (~driveOut & 0x02) L1H = 1;
-    if (~driveOut & 0x04) L2L = 0;
-    if (~driveOut & 0x08) L2H = 1;
-    if (~driveOut & 0x10) L3L = 0;
-    if (~driveOut & 0x20) L3H = 1;
-    //Turn on if current speed is less than reference
-    if(currentRPSValue < Vref) {
-        if (driveOut & 0x01) L1L = 1;
-        if (driveOut & 0x02) L1H = 0;
-        if (driveOut & 0x04) L2L = 1;
-        if (driveOut & 0x08) L2H = 0;
-        if (driveOut & 0x10) L3L = 1;
-        if (driveOut & 0x20) L3H = 0;
-    }
-}
-*/
-
+//------- Run the motor with speed limitation -------
 void motorOut(int8_t driveState){
 
     //Lookup the output byte from the drive state.
     int8_t driveOut = driveTable[driveState & 0x07];
 
-    //pwm1.period(0.02);
-    //pwm1.write(Output/255);
-    //pwm2 = 1 - pwm1;
+    //Turn off first
+    if (~driveOut & 0x01) *L1Lpwm = 0;
+    if (~driveOut & 0x02) *L1Hpwm = 1;
+    if (~driveOut & 0x04) *L2Lpwm = 0;
+    if (~driveOut & 0x08) *L2Hpwm = 1;
+    if (~driveOut & 0x10) *L3Lpwm = 0;
+    if (~driveOut & 0x20) *L3Hpwm = 1;
 
-    if (currentRPSValue <= thresholdRPS) { //low speed = PwmOut
-        //Since we cannot set the phase of the different PWM channels we cannot synchronise both the H and L pulses to be on at the same time.
-        //So leave one set with digital inputs (L1H-L3H) as before and just have PWM on the other set (L1L-L3L).
-        // do we perform all the changes in n-channel Mosfet concurrently in threads or sequentially as what's being done below?
-        delete L1Ldigi; //default pin type declared as DigitalOut upon initialisation
-        PwmOut *L1Lpwm = new PwmOut(L1Lpin);
-        L1Lpwm->period(periodDC);  //Period of pwm = 0.01seconds (10ms)
-        delete L2Ldigi;
-        PwmOut *L2Lpwm = new PwmOut(L2Lpin);
-        L2Lpwm->period(periodDC);  //Period of pwm = 0.01seconds (10ms)
-        delete L3Ldigi;
-        PwmOut *L3Lpwm = new PwmOut(L3Lpin);
-        L3Lpwm->period(periodDC);  //Period of pwm = 0.01seconds (10ms)
-
-        //Turn off first
-        if (~driveOut & 0x01) L1Lpwm = 0;
-        if (~driveOut & 0x02) L1Hdigi = 1;
-        if (~driveOut & 0x04) L2Lpwm = 0;
-        if (~driveOut & 0x08) L1Hdigi = 1;
-        if (~driveOut & 0x10) L3Lpwm = 0;
-        if (~driveOut & 0x20) L1Hdigi = 1;
-
-        //Then turn on if speed is less than reference
-        if (currentRPSValue < Vref) {
-            if (driveOut & 0x01) L1Lpwm->write(modulus(dutyCycle));
-            if (driveOut & 0x02) L1Hdigi = 0;
-            if (driveOut & 0x04) L2Lpwm->write(modulus(dutyCycle));
-            if (driveOut & 0x08) L2Hdigi = 0;
-            if (driveOut & 0x10) L3Lpwm->write(modulus(dutyCycle));
-            if (driveOut & 0x20) L3Hdigi = 0;
-        }
-    }
-
-    else { //high speed DigitalOut
-        // at high motor speed the dutycycle needs to be switched quickly but there is a latency whereby duty cycle is updated and applied upon the inductors.
-        // so we use DigitalOut instead of PwmOut here
-        // the PwmOut has higher priority over the DigitalOut but no disable function is available in the PwmOut library so:
-        delete L1Lpwm;
-        DigitalOut *L1Ldigi = new DigitalOut(L1Lpin);
-        delete L2Lpwm;
-        DigitalOut *L2Ldigi = new DigitalOut(L2Lpin);
-        delete L3Lpwm;
-        DigitalOut *L3Ldigi = new DigitalOut(L3Lpin);
-
-        //Turn off first
-        if (~driveOut & 0x01) L1Ldigi = 0;
-        if (~driveOut & 0x02) L1Hdigi = 1;
-        if (~driveOut & 0x04) L2Ldigi = 0;
-        if (~driveOut & 0x08) L1Hdigi = 1;
-        if (~driveOut & 0x10) L3Ldigi = 0;
-        if (~driveOut & 0x20) L1Hdigi = 1;
-
-        //Then turn on if current speed is less than reference
-        //[Attention] will shoot thru (short cct) occur with this configuration?
-        if(currentRPSValue < Vref) {
-            if (driveOut & 0x01) *L1Ldigi = 1;
-            if (driveOut & 0x02) L1Hdigi = 0;
-            if (driveOut & 0x04) *L2Ldigi = 1;
-            if (driveOut & 0x08) L1Hdigi = 0;
-            if (driveOut & 0x10) *L3Ldigi = 1;
-            if (driveOut & 0x20) L1Hdigi = 0;
-        }
+    //Then turn on if speed is less than reference
+    if (modulus(currentRPSValue) < Vref) {
+        if (driveOut & 0x01) L1Lpwm->write(1-modulus(dutyCycle));
+        if (driveOut & 0x02) L1Hpwm->write(modulus(dutyCycle));
+        if (driveOut & 0x04) L2Lpwm->write(1-modulus(dutyCycle));
+        if (driveOut & 0x08) L2Hpwm->write(modulus(dutyCycle));
+        if (driveOut & 0x10) L3Lpwm->write(1-modulus(dutyCycle));
+        if (driveOut & 0x20) L3Hpwm->write(modulus(dutyCycle));
+        // if (driveOut & 0x01) L1Lpwm.write(modulus(dutyCycle));
+        // if (driveOut & 0x02) L1Hpwm.write(1-modulus(dutyCycle));
+        // if (driveOut & 0x04) L2Lpwm.write(modulus(dutyCycle));
+        // if (driveOut & 0x08) L2Hpwm.write(1-modulus(dutyCycle));
+        // if (driveOut & 0x10) L3Lpwm.write(modulus(dutyCycle));
+        // if (driveOut & 0x20) L3Hpwm.write(1-modulus(dutyCycle));
     }
 }
 
@@ -251,21 +211,25 @@ void getRPSfromQEI(){
     currentPosition = wheel.getPulses();    //getPulses gets accumulated no. of pulses recorded
     float numberOfRevolutions = (currentPosition - lastPosition) / 117;
     currentRPSValue = (numberOfRevolutions / RPS_SAMPLING_RATE);
+    pc.printf("QEI rps: %f \t", currentRPSValue);
+    pc.printf("QEI count: %f \n\r", currentPosition);
 }
 
 //------- Controller -------
 void controlInit() {
-    controller.setInputLimits(0.0,targetPos);
+    controller.setInputLimits(0.0,targetPosition*100);
     controller.setOutputLimits(-1.0, 1.0); //Set duty cycle parameter as fraction
     controller.setBias(0.0);
     controller.setMode(AUTO); //SET MODE as auto
-    controller.setSetPoint(targetPos);
+    controller.setSetPoint(targetPosition);
 }
 
 void controlR() {
     while(1) {
         controller.setProcessValue(currentPosition);
         dutyCycle = controller.compute();
+        pc.printf("duty cycle: %f \n\r", dutyCycle);
+        wait(PIDrate);
     }
 }
 
@@ -275,7 +239,6 @@ void controlR() {
 int main()
 {
     //******* Initialise the serial port *******
-    RawSerial pc(SERIAL_TX, SERIAL_RX);
 
     pc.printf("Hello\n\r");
 

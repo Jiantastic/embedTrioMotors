@@ -32,8 +32,8 @@ DigitalOut led1(LED1);
 //@@@@@@@ NEW CONSTANTS Definition @@@@@@@
 RawSerial pc(SERIAL_TX, SERIAL_RX);
 
-const float Vref = 5;
-const float Rref = 100;
+const float Vref = 3;
+const float Rref = 20;
 
 //const float thresholdRPS = 33;
 //const float periodDC = 0.01; //Set duty cycle period to 0.01s (10ms)
@@ -50,9 +50,9 @@ float currentRPSValue = 0;                // global angular velocity/RPS value
 //float rotations=5; //Set a random starting variable - replaced by regex later on
 float targetPosition=117*Rref;  //30*117=3510 100*117=11700
 float PIDrate = 0.2;
-float Kc = 5.0;
-float Ti = 0.0;
-float Td = 0.0;
+float Kc = 5;
+float Ti = 0;
+float Td = 0;
 float speedControl = 0;
 float dutyCycle = 0; //global duty cycle to be passed to motorOut
 bool AUTO = 1;
@@ -221,7 +221,7 @@ void controlInit() {
     controller.setOutputLimits(-1.0, 1.0); //Set duty cycle parameter as fraction
     controller.setBias(0.0);
     controller.setMode(AUTO); //SET MODE as auto
-    controller.setSetPoint(targetPosition);   
+    controller.setSetPoint(targetPosition);
 }
 
 void controlR() {

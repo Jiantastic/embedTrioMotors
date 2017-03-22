@@ -32,10 +32,10 @@ DigitalOut led1(LED1);
 //@@@@@@@ NEW CONSTANTS Definition @@@@@@@
 RawSerial pc(SERIAL_TX, SERIAL_RX);
 
-const float Vref = 5;
-const float Rref = 100;
+const float Vref = 10;
+const float Rref = 1000;
 
-const float thresholdRPS = 33;
+const float thresholdRPS = 3;
 //const float periodDC = 0.01; //Set duty cycle period to 0.01s (10ms)
 
 int8_t intState = 0;
@@ -67,6 +67,7 @@ DigitalIn I2(I2pin);
 DigitalIn I3(I3pin);
 
 Ticker sampleRPS;
+Ticker PrintRPS;
 //Timer speedTimer;
 
 //@@@@@@@ QEI inputs @@@@@@@ NOT USED
@@ -161,7 +162,7 @@ void motorOut(int8_t driveState){
 
     //Lookup the output byte from the drive state.
     int8_t driveOut = driveTable[driveState & 0x07];
-    
+
     //Turn off first
     if (currentRPSValue <= thresholdRPS) {
 
@@ -174,18 +175,18 @@ void motorOut(int8_t driveState){
             L3Lpwm = new PwmOut(L3Lpin);
             L3Hpwm = new PwmOut(L3Hpin);
         }
-        
+
         // if digital pin pointers point to something, delete them
-        
+
         if(L1Ldigi != NULL){
             // deallocate DigitalPin pointers memory
-            delete L1Ldigi; 
+            delete L1Ldigi;
             delete L1Hdigi;
             delete L2Ldigi;
             delete L2Hdigi;
             delete L3Ldigi;
             delete L3Hdigi;
-            
+
             // set DigitalPin pointers to NULL
             L1Ldigi = NULL;
             L1Hdigi = NULL;
@@ -194,7 +195,7 @@ void motorOut(int8_t driveState){
             L3Ldigi = NULL;
             L3Hdigi = NULL;
         }
-        
+
 
 
         if (~driveOut & 0x01) *L1Lpwm = 0;
@@ -205,7 +206,7 @@ void motorOut(int8_t driveState){
         if (~driveOut & 0x20) *L3Hpwm = 1;
 
         //Then turn on if speed is less than reference
-        
+
         if (modulus(currentRPSValue) < Vref) {
             if (driveOut & 0x01) L1Lpwm->write(1-modulus(dutyCycle));
             if (driveOut & 0x02) L1Hpwm->write(modulus(dutyCycle));
@@ -282,8 +283,8 @@ int8_t motorHome()
 //------- Drive motor using position sensed by PI -------
 //dutyCycle global variable
 inline void readPIrunMotor(){
-    pc.printf("QEI rps: %f \t", currentRPSValue);
-    pc.printf("QEI count: %f \n\r", currentPosition);
+    // pc.printf("QEI rps: %f \t", currentRPSValue);
+    // pc.printf("QEI count: %f \n\r", currentPosition);
     intState = readRotorState();
     if (intState != intStateOld) {
         intStateOld = intState;
@@ -312,7 +313,7 @@ void controlInit() {
     controller.setOutputLimits(-1.0, 1.0); //Set duty cycle parameter as fraction
     controller.setBias(0.0);
     controller.setMode(AUTO); //SET MODE as auto
-    controller.setSetPoint(targetPosition);   
+    controller.setSetPoint(targetPosition);
 }
 
 void controlR() {
@@ -321,6 +322,12 @@ void controlR() {
         dutyCycle = controller.compute();
         Thread::wait(PIDrate);
     }
+}
+
+void printRPSfromQEI(){
+      pc.printf("QEI rps: %f \t", currentRPSValue);
+      pc.printf("QEI count: %f \n\r", currentPosition);
+
 }
 
 //**********************************************
@@ -342,7 +349,7 @@ int main()
     // I1.rise(&getRPSfromPI);
     // NOTE :Change 0.05 to RPS_SAMPLING_RATE
     sampleRPS.attach(&getRPSfromQEI, 0.05);
-
+    PrintRPS.attach(&printRPSfromQEI, 3);
     //******* Setup threads for controller *******
     controlInit();
     PIDthread.start(controlR);

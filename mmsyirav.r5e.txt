@@ -1,0 +1,13 @@
+﻿
+# Please enter the commit message for your changes. Lines starting
+# with '#' will be ignored, and an empty message aborts the commit.
+# On branch master
+# Your branch is up-to-date with 'origin/master'.
+#
+# Changes to be committed:
+#	new file:   EEE4 firstclass - Shortcut.lnk
+#	modified:   jian_improved_dodge_code.cpp
+#	modified:   main_working_controller.cpp
+#	modified:   main_wx.cpp
+#
+
