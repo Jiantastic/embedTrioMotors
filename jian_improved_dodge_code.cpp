@@ -178,6 +178,7 @@ void motorOut(int8_t driveState){
         // if digital pin pointers point to something, delete them
         
         if(L1Ldigi != NULL){
+            // deallocate DigitalPin pointers memory
             delete L1Ldigi; 
             delete L1Hdigi;
             delete L2Ldigi;
@@ -185,6 +186,7 @@ void motorOut(int8_t driveState){
             delete L3Ldigi;
             delete L3Hdigi;
             
+            // set DigitalPin pointers to NULL
             L1Ldigi = NULL;
             L1Hdigi = NULL;
             L2Ldigi = NULL;
@@ -211,12 +213,6 @@ void motorOut(int8_t driveState){
             if (driveOut & 0x08) L2Hpwm->write(modulus(dutyCycle));
             if (driveOut & 0x10) L3Lpwm->write(1-modulus(dutyCycle));
             if (driveOut & 0x20) L3Hpwm->write(modulus(dutyCycle));
-            // if (driveOut & 0x01) L1Lpwm.write(modulus(dutyCycle));
-            // if (driveOut & 0x02) L1Hpwm.write(1-modulus(dutyCycle));
-            // if (driveOut & 0x04) L2Lpwm.write(modulus(dutyCycle));
-            // if (driveOut & 0x08) L2Hpwm.write(1-modulus(dutyCycle));
-            // if (driveOut & 0x10) L3Lpwm.write(modulus(dutyCycle));
-            // if (driveOut & 0x20) L3Hpwm.write(1-modulus(dutyCycle));
         }
     }
     else { //high speed DigitalOut
