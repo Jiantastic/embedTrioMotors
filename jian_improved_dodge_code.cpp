@@ -175,6 +175,8 @@ void motorOut(int8_t driveState){
             L3Hpwm = new PwmOut(L3Hpin);
         }
         
+        // if digital pin pointers point to something, delete them
+        
         if(L1Ldigi != NULL){
             delete L1Ldigi; 
             delete L1Hdigi;
@@ -191,7 +193,7 @@ void motorOut(int8_t driveState){
             L3Hdigi = NULL;
         }
         
-        // if digital pin pointers point to something, delete them
+
 
         if (~driveOut & 0x01) *L1Lpwm = 0;
         if (~driveOut & 0x02) *L1Hpwm = 1;
@@ -221,8 +223,6 @@ void motorOut(int8_t driveState){
 
         // if Digital Pins point to nothing, create digital pins
         if(L1Ldigi == NULL){
-            // if digital pin pointers still exist, then delete them
-
             L1Ldigi = new DigitalOut(L1Lpin);
             L1Hdigi = new DigitalOut(L1Hpin);
             L2Ldigi = new DigitalOut(L2Lpin);
@@ -231,7 +231,7 @@ void motorOut(int8_t driveState){
             L3Hdigi = new DigitalOut(L3Hpin);
         }
 
-        // if digital pin pointers still exist, then delete them
+        // if PWM pin pointers still exist, then delete them
         if(L1Lpwm != NULL){
             // deallocate PWM pointers memory
             delete L1Lpwm;
