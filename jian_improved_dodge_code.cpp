@@ -259,11 +259,11 @@ void motorOut(int8_t driveState){
         //[Attention] will shoot thru (short cct) occur with this configuration?
         if(currentRPSValue < Vref) {
             if (driveOut & 0x01) *L1Ldigi = 1;
-            if (driveOut & 0x02) L1Hdigi = 0;
+            if (driveOut & 0x02) *L1Hdigi = 0;
             if (driveOut & 0x04) *L2Ldigi = 1;
-            if (driveOut & 0x08) L1Hdigi = 0;
+            if (driveOut & 0x08) *L2Hdigi = 0;
             if (driveOut & 0x10) *L3Ldigi = 1;
-            if (driveOut & 0x20) L1Hdigi = 0;
+            if (driveOut & 0x20) *L3Hdigi = 0;
         }
     }
 
