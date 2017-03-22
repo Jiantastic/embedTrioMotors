@@ -344,6 +344,7 @@ int main()
     //******* Setup interrupts to calculate speed from QEI and PI *******
     // speedTimer.start();
     // I1.rise(&getRPSfromPI);
+    // NOTE :Change 0.05 to RPS_SAMPLING_RATE
     sampleRPS.attach(&getRPSfromQEI, 0.05);
 
     //******* Setup threads for controller *******
