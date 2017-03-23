@@ -1,54 +1,54 @@
 #include "mbed.h"
 #include "rtos.h"
+#include "PID.h"
 #include "QEI.h"
 #include "implementation.h"
 #include "slre.h"
 #include <cstring>
-// NOTE : when to use inline for functions?
-// use volatile for information accessed by multiple threads, mutex handler to prevent race conditions
+#include <cstdlib>
+//**********************************************
+//             Main Function                   *
+//**********************************************
 
-// TODO
-// 1. Interrupts instead of polling for photointerrupters - DONE, consider moving variable definition
-// 2. Thread(semi-polling) for reading from Serial input - wait until new input comes in, keep processing until /n (enter) is found
-// 3. Get QEI library working with pins - WORKING, more testing needed to determine accuracy - probably need to add a sync component with photointerrupters
-
-Ticker samplePhotoInterrupter;
-Ticker sampleRPM;
-Thread control;
-Ticker sampleMotorHome; //for re-sync the rotor position
-
-float ROTOR_SYNC_RATE = 2; //is the rotor sync interval dependent on the rpm etc?
 char input[255];
-int charCount = 0;
-//Main
-// reading from serial input = main thread
-int main() {
+char ch;
+struct slre_cap caps[16];
+int main()
+{
+    //******* Initialise the serial port *******
 
-    // thread that handles the control algorithm inputs
-    control.start(controlAlgorithm);
+    pc.printf("Hello\n\r");
 
-    //Run the motor synchronisation
-    pc.printf("Rotor origin: %x\n\r",orState);
+    //******* Run the motor synchronisation *******
+    orState = motorHome();
+    pc.printf("Rotor origin: %x\n\r", orState);
     //orState is subtracted from future rotor state inputs to align rotor and motor states
-    //Interrupt to get rotor state and set the motor outputs accordingly to spin the motor
-    // samplePhotoInterrupter.attach(&readPhotoInterrupterState,0.001);
-    samplePhotoInterrupter.attach(&readPhotoInterrupterState,Output/255);
-    sampleRPM.attach(&getRPMFromPositionEncoder,RPM_SAMPLING_RATE);
-    sampleMotorHome.attach(&motorHome,ROTOR_SYNC_RATE)
 
-    while (1) {
+    //******* Setup interrupts to calculate speed from QEI and PI *******
+    // speedTimer.start();
+    // I1.rise(&getRPSfromPI);
+    sampleRPS.attach(&getRPSfromQEI, RPS_SAMPLING_RATE);
+    PrintRPS.attach(&printRPSfromQEI, 10);
+    //******* Setup threads for controller *******
+//    controlInit();
+    
+
+    //******* Poll the rotor state and set the motor outputs accordingly to spin the motor *******
+    while (1)
+    {
+        // REGEX HANDLER
         if(pc.readable()){
             // extensive testing is needed to see if memset does what it is supposed to do
             // TODO : have not tested with interrupts + other threads
-            memset(test, 0, 255);
+            memset(input, 0, 255);
             int charCount = 0;
             do{
                 ch = pc.getc();
                 pc.putc(ch);
-                test[charCount++] = ch;
+                input[charCount++] = ch;
             } while(ch != 10 && ch != 13);
 
-            const char *request = (const char*)test;
+            const char *request = (const char*)input;
 
             pc.printf("My Name is %s", request);
 
@@ -68,24 +68,25 @@ int main() {
                 caps[0].len, caps[0].ptr,
                 caps[1].len, caps[1].ptr);
 
-                // const char *test = caps[0].ptr;
-                // float f1;
-                // f1 = atof(test);
-                // cout << "value of float f1 " << f1 << endl;
-                // string s = test;
-                // cout << "value of s " << s << endl;
-                // printf("Method: [%.*s], URI: [%.*s]\n",
-                //  caps[0].len, caps[0].ptr,
-                //  caps[1].len, caps[1].ptr);
+                float ftemp = atof(caps[0].ptr);
+                Vref = 35;
+                Rref = ftemp;
+
+
+            
             }
             else if(slre_match("^V([0-9][0-9]?[0-9]?(\\.[0-9][0-9]?[0-9]?)?)[\r\n]+$",
                     request, strlen(request), caps, 10, 0) > 0){
-
+                        
                 pc.printf("Group 2 - V command ONLY\n");
 
                 pc.printf("CAP 1: [%.*s], CAP 2: [%.*s]\n",
                 caps[0].len, caps[0].ptr,
                 caps[1].len, caps[1].ptr);
+                
+                float ftemp = atof(caps[0].ptr);
+                Vref = ftemp;
+                PIDthread.start(readPIrunMotor);
             }
             else if(slre_match("^R(-?[0-9][0-9]?[0-9]?)V([0-9][0-9]?[0-9]?)[\r\n]+$",
                     request, strlen(request), caps, 10, 0) > 0){
@@ -119,7 +120,7 @@ int main() {
             else if(slre_match("^R(-?[0-9][0-9]?[0-9]?\\.[0-9][0-9]?)V([0-9][0-9]?[0-9]?\\.[0-9][0-9]?[0-9]?)[\r\n]+$",
                     request, strlen(request), caps, 10, 0) > 0){
 
-
+                
                 pc.printf("Group 6 - RV command, decimal for R AND V\n");
 
                 pc.printf("CAP 1: [%.*s], CAP 2: [%.*s]\n",
@@ -149,12 +150,12 @@ int main() {
                 caps[13].len, caps[13].ptr,
                 caps[14].len, caps[14].ptr,
                 caps[15].len, caps[15].ptr);
-
+                
             }
             else{
                 pc.printf("Error parsing. Please enter a valid command.");
             }
-            wait(0.5);
+            Thread::wait(5);
         }
     }
 }
