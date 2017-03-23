@@ -310,7 +310,7 @@ void getRPSfromQEI(){
 //------- Controller -------
 void controlInit() {
     controller.setInputLimits(0.0,targetPosition*50);
-    controller.setOutputLimits(-1.0, 1.0); //Set duty cycle parameter as fraction
+    controller.setOutputLimits(0.725, 1.0); //Set duty cycle parameter as fraction
     controller.setBias(0.0);
     controller.setMode(AUTO); //SET MODE as auto
     controller.setSetPoint(targetPosition);
