@@ -88,7 +88,6 @@ void motorOut(int8_t driveState){
 
     //Turn off first
     if (currentRPSValue <= thresholdRPS) {
-
         // if PWM pointers point to nothing, create new PwmOut Pins
         if(L1Lpwm == NULL){
             L1Lpwm = new PwmOut(L1Lpin);
@@ -289,7 +288,7 @@ void readPIrunMotor(){
 
 void initMotorOut(int8_t driveState){
 
-
+    int8_t driveOut = driveTable[driveState & 0x07];
     // if Digital Pins point to nothing, create digital pins
     if(L1Ldigi == NULL){
         L1Ldigi = new DigitalOut(L1Lpin);
