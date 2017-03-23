@@ -71,8 +71,16 @@ int main()
                 float ftemp = atof(caps[0].ptr);
                 Vref = 35;
                 Rref = ftemp;
+                
+                for(int i=0;i<5;i++){
+                    intState = readRotorState();
+                    if (intState != intStateOld) {
+                        intStateOld = intState;
+                        initMotorOut((intState-orState+lead+6)%6); //+6 to make sure the remainder is positive
+                    }
+                }
 
-
+                // start thread controller
             
             }
             else if(slre_match("^V([0-9][0-9]?[0-9]?(\\.[0-9][0-9]?[0-9]?)?)[\r\n]+$",
@@ -86,6 +94,16 @@ int main()
                 
                 float ftemp = atof(caps[0].ptr);
                 Vref = ftemp;
+                
+                for(int i=0;i<5;i++){
+                    intState = readRotorState();
+                    if (intState != intStateOld) {
+                        intStateOld = intState;
+                        initMotorOut((intState-orState+lead+6)%6); //+6 to make sure the remainder is positive
+                    }
+                }
+                
+                // start thread controller
                 PIDthread.start(readPIrunMotor);
             }
             else if(slre_match("^R(-?[0-9][0-9]?[0-9]?)V([0-9][0-9]?[0-9]?)[\r\n]+$",
