@@ -42,7 +42,7 @@ int8_t intState = 0;
 int8_t intStateOld = 0;
 int8_t orState = 0; //Rotor offset at motor state 0
 
-const float RPS_SAMPLING_RATE = 0.1;      // rate at which interrupt is called, also the time difference(t) since the last interrupt call
+const float RPS_SAMPLING_RATE = 0.05;      // rate at which interrupt is called, also the time difference(t) since the last interrupt call
 float lastPosition = 0;
 float currentPosition = 0;
 float currentRPSValue = 0;                // global angular velocity/RPS value
@@ -348,7 +348,7 @@ int main()
     // speedTimer.start();
     // I1.rise(&getRPSfromPI);
     // NOTE :Change 0.05 to RPS_SAMPLING_RATE
-    sampleRPS.attach(&getRPSfromQEI, 0.05);
+    sampleRPS.attach(&getRPSfromQEI, RPS_SAMPLING_RATE);
     PrintRPS.attach(&printRPSfromQEI, 3);
     //******* Setup threads for controller *******
     controlInit();
