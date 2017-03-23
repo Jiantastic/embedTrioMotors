@@ -32,6 +32,7 @@ int main()
     //******* Setup threads for controller *******
 //    controlInit();
     
+    
 
     //******* Poll the rotor state and set the motor outputs accordingly to spin the motor *******
     while (1)
@@ -72,13 +73,6 @@ int main()
                 Vref = 35;
                 Rref = ftemp;
                 
-                for(int i=0;i<5;i++){
-                    intState = readRotorState();
-                    if (intState != intStateOld) {
-                        intStateOld = intState;
-                        initMotorOut((intState-orState+lead+6)%6); //+6 to make sure the remainder is positive
-                    }
-                }
 
                 // start thread controller
             
@@ -95,16 +89,19 @@ int main()
                 float ftemp = atof(caps[0].ptr);
                 Vref = ftemp;
                 
-                for(int i=0;i<5;i++){
-                    intState = readRotorState();
-                    if (intState != intStateOld) {
-                        intStateOld = intState;
-                        initMotorOut((intState-orState+lead+6)%6); //+6 to make sure the remainder is positive
-                    }
-                }
+                pc.printf("hello world here");
+                PIDthread.start(readPIrunMotor);
+                
+//                for(int i=0;i<5;i++){
+//                    intState = readRotorState();
+//                    if (intState != intStateOld) {
+//                        intStateOld = intState;
+//                        initMotorOut((intState-orState+lead+6)%6); //+6 to make sure the remainder is positive
+//                    }
+//                }
                 
                 // start thread controller
-                PIDthread.start(readPIrunMotor);
+                
             }
             else if(slre_match("^R(-?[0-9][0-9]?[0-9]?)V([0-9][0-9]?[0-9]?)[\r\n]+$",
                     request, strlen(request), caps, 10, 0) > 0){
