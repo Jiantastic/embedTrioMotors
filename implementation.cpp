@@ -286,3 +286,53 @@ void readPIrunMotor(){
    Thread::wait(5);
    }
 }
+
+void initMotorOut(int8_t driveState){
+
+
+    // if Digital Pins point to nothing, create digital pins
+    if(L1Ldigi == NULL){
+        L1Ldigi = new DigitalOut(L1Lpin);
+        L1Hdigi = new DigitalOut(L1Hpin);
+        L2Ldigi = new DigitalOut(L2Lpin);
+        L2Hdigi = new DigitalOut(L2Hpin);
+        L3Ldigi = new DigitalOut(L3Lpin);
+        L3Hdigi = new DigitalOut(L3Hpin);
+    }
+
+    // if PWM pin pointers still exist, then delete them
+    if(L1Lpwm != NULL){
+        // deallocate PWM pointers memory
+        delete L1Lpwm;
+        delete L1Hpwm;
+        delete L2Lpwm;
+        delete L2Hpwm;
+        delete L3Lpwm;
+        delete L3Hpwm;
+
+        // set PWM pointers to NULL
+        L1Lpwm = NULL;
+        L1Hpwm = NULL;
+        L2Lpwm = NULL;
+        L2Hpwm = NULL;
+        L3Lpwm = NULL;
+        L3Hpwm = NULL;
+    }
+
+
+    //Turn off first
+    if (~driveOut & 0x01) *L1Ldigi = 0;
+    if (~driveOut & 0x02) *L1Hdigi = 1;
+    if (~driveOut & 0x04) *L2Ldigi = 0;
+    if (~driveOut & 0x08) *L1Hdigi = 1;
+    if (~driveOut & 0x10) *L3Ldigi = 0;
+    if (~driveOut & 0x20) *L1Hdigi = 1;
+
+    if (driveOut & 0x01) *L1Ldigi = 1;
+    if (driveOut & 0x02) *L1Hdigi = 0;
+    if (driveOut & 0x04) *L2Ldigi = 1;
+    if (driveOut & 0x08) *L2Hdigi = 0;
+    if (driveOut & 0x10) *L3Ldigi = 1;
+    if (driveOut & 0x20) *L3Hdigi = 0;
+
+}
