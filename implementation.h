@@ -95,15 +95,15 @@ const int8_t stateMap[] = {0x07, 0x05, 0x03, 0x04, 0x01, 0x00, 0x02, 0x07};
 //const int8_t stateMap[] = {0x07,0x01,0x03,0x02,0x05,0x00,0x04,0x07}; //Alternative if phase order of input or drive is reversed
 
 //@@@@@@@ Phase lead to make motor spin @@@@@@@ Must change according to PID output value
-const int8_t lead = -1; //2 for forwards, -2 for backwards
+const int8_t lead = 2; //2 for forwards, -2 for backwards
 
 // New Constants(not constants with regex)
 
 extern float Vref;      // speed to be changed by regex
 extern float Rref;      // rotation to be changed by regex
-const float thresholdRPS = 0.1;
+const float thresholdRPS = 5;
 // rate at which interrupt is called, also the time difference(t) since the last interrupt call
-const float RPS_SAMPLING_RATE = 0.1;  
+const float RPS_SAMPLING_RATE = 0.05;  
 
 
 //------- Convert photointerrupter inputs to a rotor state -------
@@ -121,5 +121,5 @@ void controlInit();
 void controlR();
 void printRPSfromQEI();
 void readPIrunMotor();
-
+void initMotorOut(int8_t driveState);
 #endif
