@@ -38,9 +38,9 @@ float currentRPSValue = 0;               // global angular velocity/RPS value
 float targetPosition=117*Rref;
 float PIDrate = 0.2;
 
-float Kc = 500.0;
+float Kc = 5.0;
 float Ti = 0.0;
-float Td = 5000;
+float Td = 1.0;
 bool AUTO = 1;
 float dutyCycle = 1;                    //global duty cycle to be passed to motorOut
 float oriDutyCycle = 0;

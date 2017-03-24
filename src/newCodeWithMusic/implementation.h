@@ -131,11 +131,15 @@ inline void readPIrunMotor(){
     if (intState != intStateOld) {
         intStateOld = intState;
         if (oriDutyCycle > 0) {
-            dutyCycle = modulus(oriDutyCycle)*0.4 + 0.6;
+            if(dutyCycle > 0.2) {
+                dutyCycle = modulus(oriDutyCycle)*0.5 + 0.5;
+            }
             motorOut((intState - orState + lead + 6 ) % 6); //Forwards
         }
         else{
-            dutyCycle = modulus(oriDutyCycle)*0.4 + 0.6;
+            if(dutyCycle < 0.2) {
+                dutyCycle = modulus(oriDutyCycle)*0.5 + 0.5;
+            }
             motorOut((intState - orState - lead + 6 ) % 6); //backwards
         }
     }

@@ -67,6 +67,11 @@ int main()
 
                 pc.printf("Group 1 - R command ONLY\n\r");
 
+                currentRPSValue = 0;
+                Vref = 25;
+                pc.printf("Hello, please wait for rotor to initialise\n\r");
+                motorHome();
+
                 wheel.reset();
 
                 // set veloctiy and rotation values
@@ -86,6 +91,11 @@ int main()
                         
                 pc.printf("Group 2 - V command ONLY\n\r");
 
+                currentRPSValue = 0;
+                Vref = 25;
+                pc.printf("Hello, please wait for rotor to initialise\n\r");
+                motorHome();
+
                 wheel.reset();
 
                 float vCommandToFloat = atof(caps[0].ptr);
@@ -102,6 +112,11 @@ int main()
 
                 pc.printf("Group 3 - RV command, NO decimals\n\r");
 
+                currentRPSValue = 0;
+                Vref = 25;
+                pc.printf("Hello, please wait for rotor to initialise\n\r");
+                motorHome();
+
                 wheel.reset();
 
                 float rCommandToFloat = atof(caps[0].ptr);
@@ -109,6 +124,7 @@ int main()
 
                 Rref = rCommandToFloat;
                 Vref = vCommandToFloat;
+                targetPosition = 117*Rref;
 
                 // start controller thread
                 controlInit();
@@ -121,6 +137,11 @@ int main()
 
                 pc.printf("Group 4 - RV command, decimal for R ONLY\n\r");
 
+                currentRPSValue = 0;
+                Vref = 25;
+                pc.printf("Hello, please wait for rotor to initialise\n\r");
+                motorHome();
+
                 wheel.reset();
 
                 float rCommandToFloat = atof(caps[0].ptr);
@@ -128,6 +149,7 @@ int main()
 
                 Rref = rCommandToFloat;
                 Vref = vCommandToFloat;
+                targetPosition = 117*Rref;
 
                 // start controller thread
                 controlInit();
@@ -139,6 +161,11 @@ int main()
 
                 pc.printf("Group 5 - RV command, decimal for V ONLY\n\r");
 
+                currentRPSValue = 0;
+                Vref = 25;
+                pc.printf("Hello, please wait for rotor to initialise\n\r");
+                motorHome();
+
                 wheel.reset();
 
                 float rCommandToFloat = atof(caps[0].ptr);
@@ -146,6 +173,7 @@ int main()
 
                 Rref = rCommandToFloat;
                 Vref = vCommandToFloat;
+                targetPosition = 117*Rref;
 
                 // start controller thread
                 controlInit();
@@ -158,6 +186,11 @@ int main()
                 
                 pc.printf("Group 6 - RV command, decimal for R AND V\n\r");
 
+                currentRPSValue = 0;
+                Vref = 25;
+                pc.printf("Hello, please wait for rotor to initialise\n\r");
+                motorHome();
+
                 wheel.reset();
 
                 float rCommandToFloat = atof(caps[0].ptr);
@@ -165,6 +198,7 @@ int main()
 
                 Rref = rCommandToFloat;
                 Vref = vCommandToFloat;
+                targetPosition = 117*Rref;
 
                 // start controller thread
                 controlInit();
