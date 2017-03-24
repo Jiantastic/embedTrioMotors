@@ -16,16 +16,12 @@ DigitalIn CHBInput(CHB);
 
 
 //Motor Drive outputs
-DigitalOut *L1Ldigi = new DigitalOut(L1Lpin);
-DigitalOut *L1Hdigi = new DigitalOut(L1Hpin);
-DigitalOut *L2Ldigi = new DigitalOut(L2Lpin);
-DigitalOut *L2Hdigi = new DigitalOut(L2Hpin);
-DigitalOut *L3Ldigi = new DigitalOut(L3Lpin);
-DigitalOut *L3Hdigi = new DigitalOut(L3Hpin);
-
-PwmOut *L1Lpwm = new PwmOut(L1Lpin);
-PwmOut *L2Lpwm = new PwmOut(L2Lpin);
-PwmOut *L3Lpwm = new PwmOut(L3Lpin);
+PwmOut L1Lpwm(L1Lpin);
+PwmOut L2Lpwm(L2Lpin);
+PwmOut L3Lpwm(L3Lpin);
+DigitalOut L1Hdigi(L1Hpin);
+DigitalOut L2Hdigi(L2Hpin);
+DigitalOut L3Hdigi(L3Hpin);
 
 RawSerial pc(SERIAL_TX, SERIAL_RX);
 // QEI config
@@ -42,9 +38,9 @@ float currentRPSValue = 0;               // global angular velocity/RPS value
 float targetPosition=117*Rref;
 float PIDrate = 0.2;
 
-float Kc = 20.0;
-float Ti = 0.125;
-float Td = 4.0;
+float Kc = 500.0;
+float Ti = 0.0;
+float Td = 5000;
 bool AUTO = 1;
 float dutyCycle = 1;                    //global duty cycle to be passed to motorOut
 float oriDutyCycle = 0;
@@ -55,7 +51,7 @@ Thread pidThread;
 Ticker sampleRPS;
 Ticker PrintRPS;
 
-float Vref = 25;
+float Vref = 60;
 float Rref = 0;
 
 
@@ -76,69 +72,20 @@ void motorOut(int8_t driveState){
 
     int8_t driveOut = driveTable[driveState & 0x07];
 
-    if (currentRPSValue <= thresholdRPS) {      //Use PWM at low speeds
-        if(L1Lpwm == NULL){                 // if PWM pointers point to nothing, create new PwmOut Pins
-            L1Lpwm = new PwmOut(L1Lpin);
-            L2Lpwm = new PwmOut(L2Lpin);
-            L3Lpwm = new PwmOut(L3Lpin);
-        }
+    if (~driveOut & 0x01) L1Lpwm = 0;
+    if (~driveOut & 0x02) L1Hdigi = 1;
+    if (~driveOut & 0x04) L2Lpwm = 0;
+    if (~driveOut & 0x08) L2Hdigi = 1;
+    if (~driveOut & 0x10) L3Lpwm = 0;
+    if (~driveOut & 0x20) L3Hdigi = 1;
 
-        if(L1Ldigi != NULL){            // if digital pin pointers point to something, delete them
-            delete L1Ldigi;
-            delete L2Ldigi;;
-            delete L3Ldigi;
-            L1Ldigi = NULL;
-            L2Ldigi = NULL;
-            L3Ldigi = NULL;
-        }
-
-        if (~driveOut & 0x01) *L1Lpwm = 0;
-        if (~driveOut & 0x02) *L1Hdigi = 1;
-        if (~driveOut & 0x04) *L2Lpwm = 0;
-        if (~driveOut & 0x08) *L2Hdigi = 1;
-        if (~driveOut & 0x10) *L3Lpwm = 0;
-        if (~driveOut & 0x20) *L3Hdigi = 1;
-
-        if (currentRPSValue < Vref) {
-            if (driveOut & 0x01) L1Lpwm->write(dutyCycle);
-            if (driveOut & 0x02) *L1Hdigi = 0;
-            if (driveOut & 0x04) L2Lpwm->write(dutyCycle);
-            if (driveOut & 0x08) *L2Hdigi = 0;
-            if (driveOut & 0x10) L3Lpwm->write(dutyCycle);
-            if (driveOut & 0x20) *L3Hdigi = 0;
-        }
-    }
-
-    else { //High Speed use digitalpin
-        if(L1Ldigi == NULL){
-            L1Ldigi = new DigitalOut(L1Lpin);
-            L2Ldigi = new DigitalOut(L2Lpin);
-            L3Ldigi = new DigitalOut(L3Lpin);
-        }
-        if(L1Lpwm != NULL){
-            delete L1Lpwm;
-            delete L2Lpwm;
-            delete L3Lpwm;
-            L1Lpwm = NULL;
-            L2Lpwm = NULL;
-            L3Lpwm = NULL;
-        }
-
-        if (~driveOut & 0x01) *L1Ldigi = 0;
-        if (~driveOut & 0x02) *L1Hdigi = 1;
-        if (~driveOut & 0x04) *L2Ldigi = 0;
-        if (~driveOut & 0x08) *L1Hdigi = 1;
-        if (~driveOut & 0x10) *L3Ldigi = 0;
-        if (~driveOut & 0x20) *L1Hdigi = 1;
-
-        if(currentRPSValue < Vref) {
-            if (driveOut & 0x01) *L1Ldigi = 1;
-            if (driveOut & 0x02) *L1Hdigi = 0;
-            if (driveOut & 0x04) *L2Ldigi = 1;
-            if (driveOut & 0x08) *L2Hdigi = 0;
-            if (driveOut & 0x10) *L3Ldigi = 1;
-            if (driveOut & 0x20) *L3Hdigi = 0;
-        }
+    if (currentRPSValue < Vref) {
+        if (driveOut & 0x01) L1Lpwm.write(dutyCycle);
+        if (driveOut & 0x02) L1Hdigi = 0;
+        if (driveOut & 0x04) L2Lpwm.write(dutyCycle);
+        if (driveOut & 0x08) L2Hdigi = 0;
+        if (driveOut & 0x10) L3Lpwm.write(dutyCycle);
+        if (driveOut & 0x20) L3Hdigi = 0;
     }
 }
 
@@ -196,107 +143,113 @@ void playMusic(const char* c, int l) {                          //Take in i
          case 'A':  
             switch(c[1]) {
                 case '#':
-                    L1Lpwm->period(1.0f/music[1]);
-                    L1Lpwm->write(0.5f);
+                    L1Lpwm.period(1.0f/music[1]);
+                    L1Lpwm.write(0.5f);
                     wait((int)c[2]-48);
                     break;
                 case '^' :
-                    L1Lpwm->period(1.0f/music[11]);
-                    L1Lpwm->write(0.5f);
+                    L1Lpwm.period(1.0f/music[11]);
+                    L1Lpwm.write(0.5f);
                     wait((int)c[2]-48);
                     break;
                 default:
-                    L1Lpwm->period(1.0f/music[0]);
-                    L1Lpwm->write(0.5f);
+                    L1Lpwm.period(1.0f/music[0]);
+                    L1Lpwm.write(0.5f);
+                    pc.printf("Playing A \n\r");
+                    pc.printf("Time of A: %c \t",c[1]);
                     wait((int)c[1]-48);
+                    pc.printf("after A \n\r");
                     break;
             }         
          case 'B':  
             switch(c[1]) {
                 case '^' :
-                    L1Lpwm->period(1.0f/music[1]);
-                    L1Lpwm->write(0.5f);
+                    L1Lpwm.period(1.0f/music[1]);
+                    L1Lpwm.write(0.5f);
                     wait((int)c[2]-48);
                     break;
                 default:
-                    L1Lpwm->period(1.0f/music[2]);
-                    L1Lpwm->write(0.5f);
+                    L1Lpwm.period(1.0f/music[2]);
+                    L1Lpwm.write(0.5f);
                     wait((int)c[1]-48);
                     break;
             }  
         case 'C':  
             switch(c[1]) {
                 case '#':
-                    L1Lpwm->period(1.0f/music[4]);
-                    L1Lpwm->write(0.5f);
+                    L1Lpwm.period(1.0f/music[4]);
+                    L1Lpwm.write(0.5f);
                     wait((int)c[2]-48);
                     break;
                 default:
-                    L1Lpwm->period(1.0f/music[3]);
-                    L1Lpwm->write(0.5f);
+                    L1Lpwm.period(1.0f/music[3]);
+                    L1Lpwm.write(0.5f);
                     wait((int)c[1]-48);
                     break;
             } 
         case 'D':  
             switch(c[1]) {
                 case '#':
-                    L1Lpwm->period(1.0f/music[6]);
-                    L1Lpwm->write(0.5f);
+                    L1Lpwm.period(1.0f/music[6]);
+                    L1Lpwm.write(0.5f);
                     wait((int)c[2]-48);
                     break;
                 case '^' :
-                    L1Lpwm->period(1.0f/music[4]);
-                    L1Lpwm->write(0.5f);
+                    L1Lpwm.period(1.0f/music[4]);
+                    L1Lpwm.write(0.5f);
                     wait((int)c[2]-48);
                     break;
                 default:
-                    L1Lpwm->period(1.0f/music[5]);
-                    L1Lpwm->write(0.5f);
+                    L1Lpwm.period(1.0f/music[5]);
+                    L1Lpwm.write(0.5f);
                     wait((int)c[1]-48);
                     break;
             } 
         case 'E':  
             switch(c[1]) {
                 case '^' :
-                    L1Lpwm->period(1.0f/music[6]);
-                    L1Lpwm->write(0.5f);
+                    L1Lpwm.period(1.0f/music[6]);
+                    L1Lpwm.write(0.5f);
                     wait((int)c[2]-48);
                     break;
                 default:
-                    L1Lpwm->period(1.0f/music[7]);
-                    L1Lpwm->write(0.5f);
+                    L1Lpwm.period(1.0f/music[7]);
+                    L1Lpwm.write(0.5f);
                     wait((int)c[1]-48);
                     break;
             } 
         case 'F':  
             switch(c[1]) {
                 case '#':
-                    L1Lpwm->period(1.0f/music[9]);
-                    L1Lpwm->write(0.5f);
+                    L1Lpwm.period(1.0f/music[9]);
+                    L1Lpwm.write(0.5f);
                     wait((int)c[2]-48);
                     break;
                 default:
-                    L1Lpwm->period(1.0f/music[8]);
-                    L1Lpwm->write(0.5f);
+                    L1Lpwm.period(1.0f/music[8]);
+                    L1Lpwm.write(0.5f);
                     wait((int)c[1]-48);
                     break;
             } 
         case 'G':  
             switch(c[1]) {
                 case '#':
-                    L1Lpwm->period(1.0f/music[11]);
-                    L1Lpwm->write(0.5f);
+                    L1Lpwm.period(1.0f/music[11]);
+                    L1Lpwm.write(0.5f);
                     wait((int)c[2]-48);
                     break;
                 case '^' :
-                    L1Lpwm->period(1.0f/music[9]);
-                    L1Lpwm->write(0.5f);
+                    L1Lpwm.period(1.0f/music[9]);
+                    L1Lpwm.write(0.5f);
                     wait((int)c[2]-48);
                     break;
                 default:
-                    L1Lpwm->period(1.0f/music[10]);
-                    L1Lpwm->write(0.5f);
+                    L1Lpwm.period(1.0f/music[10]);
+                    L1Lpwm.write(0.5f);
+                    pc.printf("Playing G \n\r");
+                    pc.printf("Time of G: %c \t",c[1]);
                     wait((int)c[1]-48);
+                    pc.printf("after G \n\r");
                     break;
             }   
          default:  
