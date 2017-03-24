@@ -65,6 +65,7 @@ int main()
             if(slre_match("^R(-?[0-9][0-9]?[0-9]?(\\.[0-9][0-9]?)?)[\r\n]+$",
                 request, strlen(request), caps, 10, 0) > 0){
 
+                pidThread.terminate();
                 pc.printf("Group 1 - R command ONLY\n\r");
 
                 currentRPSValue = 0;
@@ -89,6 +90,7 @@ int main()
             else if(slre_match("^V([0-9][0-9]?[0-9]?(\\.[0-9][0-9]?[0-9]?)?)[\r\n]+$",
                     request, strlen(request), caps, 10, 0) > 0){
                         
+                pidThread.terminate();
                 pc.printf("Group 2 - V command ONLY\n\r");
 
                 currentRPSValue = 0;
@@ -101,6 +103,7 @@ int main()
                 float vCommandToFloat = atof(caps[0].ptr);
                 Vref = vCommandToFloat;
                 Rref = 99999;
+                targetPosition = 117*Rref;
        
                 // start controller thread
                 controlInit();
@@ -110,6 +113,7 @@ int main()
             else if(slre_match("^R(-?[0-9][0-9]?[0-9]?)V([0-9][0-9]?[0-9]?)[\r\n]+$",
                     request, strlen(request), caps, 10, 0) > 0){
 
+                pidThread.terminate();
                 pc.printf("Group 3 - RV command, NO decimals\n\r");
 
                 currentRPSValue = 0;
@@ -135,6 +139,7 @@ int main()
             else if(slre_match("^R(-?[0-9][0-9]?[0-9]?\\.[0-9][0-9]?)V([0-9][0-9]?[0-9]?)[\r\n]+$",
                     request, strlen(request), caps, 10, 0) > 0){
 
+                pidThread.terminate();
                 pc.printf("Group 4 - RV command, decimal for R ONLY\n\r");
 
                 currentRPSValue = 0;
@@ -159,6 +164,7 @@ int main()
             else if(slre_match("^R(-?[0-9][0-9]?[0-9]?)V([0-9][0-9]?[0-9]?\\.[0-9][0-9]?[0-9]?)[\r\n]+$",
                     request, strlen(request), caps, 10, 0) > 0){
 
+                pidThread.terminate();
                 pc.printf("Group 5 - RV command, decimal for V ONLY\n\r");
 
                 currentRPSValue = 0;
@@ -183,7 +189,7 @@ int main()
             else if(slre_match("^R(-?[0-9][0-9]?[0-9]?\\.[0-9][0-9]?)V([0-9][0-9]?[0-9]?\\.[0-9][0-9]?[0-9]?)[\r\n]+$",
                     request, strlen(request), caps, 10, 0) > 0){
 
-                
+                pidThread.terminate();
                 pc.printf("Group 6 - RV command, decimal for R AND V\n\r");
 
                 currentRPSValue = 0;
