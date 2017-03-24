@@ -2,6 +2,8 @@
 
 # Testing guide
 
+Correct source code is in ./src/newCodeWithMusic.
+
 The motor takes 3 seconds to initialise to motorHome(). Please wait for 3 seconds before you input any commands.
 
 After 3 seconds, you should see something along the lines of:
