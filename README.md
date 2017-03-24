@@ -1,5 +1,34 @@
 # embedTrioMotors
 
+# Testing guide
+
+The motor takes 3 seconds to initialise to motorHome(). Please wait for 3 seconds before you input any commands.
+
+After 3 seconds, you should see something along the lines of:
+
+` Rotor origin : 5 `
+
+You can now input user commands :)
+
+We are using a regular expression library to take in user input. User input runs in a thread, thus user can input new commands at any given time.
+
+Valid inputs are according to specification, as detailed here :
+
+[ Insert Slide Image on Regex ]
+
+
+
+# Debugging
+
+There might be some bugs during testing.
+
+In the event of this, please consider the following :
+
+Pressing the reset button on the mbed board, followed by waiting for something like ` Rotor origin : 5 ` to appear
+
+
+
+
 MCU Nucleo board: https://developer.mbed.org/platforms/ST-Nucleo-F303K8/
 
 ## To-do-list:
