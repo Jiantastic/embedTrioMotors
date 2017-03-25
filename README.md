@@ -2,7 +2,7 @@
 
 # Testing guide
 
-Correct source code is in ./src/newCodeWithMusic.
+Correct source code is in <strong>./src/newCodeWithMusic.</strong>
 
 The motor takes 3 seconds to initialise to motorHome(). Please wait for 3 seconds before you input any commands.
 
@@ -27,7 +27,7 @@ The code has been developed and tested with a power source, works fine with no s
 
 There might be some bugs during testing.
 
-In the event of this, please consider the following :
+<strong>In the event of this, please consider the following :</strong>
 
 Pressing the reset button on the mbed board, followed by waiting for something like ` Rotor origin : 5 ` to appear before inputting a user command
 
