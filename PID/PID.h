@@ -1,5 +1,5 @@
 /**
- * @author Brett Beauregard
+ * @author Aaron Berk
  *
  * @section LICENSE
  *
@@ -30,7 +30,7 @@
  *
  * This library is a port of Brett Beauregard's Arduino PID library:
  *
- *  https://github.com/br3ttb/Arduino-PID-Library
+ *  http://www.arduino.cc/playground/Code/PIDLibrary
  *
  * The wikipedia article on PID controllers is a good place to start on
  * understanding how they work:
@@ -43,95 +43,171 @@
  *
  *  http://www.controlguru.com/
  */
- 
- 
+
+#ifndef PID_H
+#define PID_H
+
 /**
  * Includes
  */
 #include "mbed.h"
- 
+
 /**
  * Defines
  */
- 
-#ifndef PID_H
-#define PID_H
+#define MANUAL_MODE 0
+#define AUTO_MODE   1
 
-#define LIBRARY_VERSION 1.1.1
+/**
+ * Proportional-integral-derivative controller.
+ */
+class PID {
 
-class PID
-{
+public:
 
+    /**
+     * Constructor.
+     *
+     * Sets default limits [0-3.3V], calculates tuning parameters, and sets
+     * manual mode with no bias.
+     *
+     * @param Kc - Tuning parameter
+     * @param tauI - Tuning parameter
+     * @param tauD - Tuning parameter
+     * @param interval PID calculation performed every interval seconds.
+     */
+    PID(float Kc, float tauI, float tauD, float interval);
 
-  public:
+    /**
+     * Scale from inputs to 0-100%.
+     *
+     * @param InMin The real world value corresponding to 0%.
+     * @param InMax The real world value corresponding to 100%.
+     */
+    void setInputLimits(float inMin , float inMax);
 
-  //Constants used in some of the functions below
-  #define AUTOMATIC 1
-  #define MANUAL    0
-  #define DIRECT  0
-  #define REVERSE  1
+    /**
+     * Scale from outputs to 0-100%.
+     *
+     * @param outMin The real world value corresponding to 0%.
+     * @param outMax The real world value corresponding to 100%.
+     */
+    void setOutputLimits(float outMin, float outMax);
 
-  //commonly used functions **************************************************************************
-    PID(float*, float*, float*,        // * constructor.  links the PID to the Input, Output, and 
-        float, float, float, int);     //   Setpoint.  Initial tuning parameters are also set here
+    /**
+     * Calculate PID constants.
+     *
+     * Allows parameters to be changed on the fly without ruining calculations.
+     *
+     * @param Kc - Tuning parameter
+     * @param tauI - Tuning parameter
+     * @param tauD - Tuning parameter
+     */
+    void setTunings(float Kc, float tauI, float tauD);
+
+    /**
+     * Reinitializes controller internals. Automatically
+     * called on a manual to auto transition.
+     */
+    void reset(void);
     
-    void SetMode(int Mode);               // * sets PID to either Manual (0) or Auto (non-0)
-
-    bool Compute();                       // * performs the PID calculation.  it should be
-                                          //   called every time loop() cycles. ON/OFF and
-                                          //   calculation frequency can be set using SetMode
-                                          //   SetSampleTime respectively
-
-    void SetOutputLimits(float, float); //clamps the output to a specific range. 0-1.0 by default, but
-                                          //it's likely the user will want to change this depending on
-                                          //the application
+    /**
+     * Set PID to manual or auto mode.
+     *
+     * @param mode        0 -> Manual
+     *             Non-zero -> Auto
+     */
+    void setMode(int mode);
     
-
-
-  //available but not commonly used functions ********************************************************
-    void SetTunings(float, float,       // * While most users will set the tunings once in the 
-                    float);              //   constructor, this function gives the user the option
-                                          //   of changing tunings during runtime for Adaptive control
-    void SetControllerDirection(int);     // * Sets the Direction, or "Action" of the controller. DIRECT
-                                          //   means the output will increase when error is positive. REVERSE
-                                          //   means the opposite.  it's very unlikely that this will be needed
-                                          //   once it is set in the constructor.
-    void SetSampleTime(int);              // * sets the frequency, in Milliseconds, with which 
-                                          //   the PID calculation is performed.  default is 100
-                                          
-                                          
-                                          
-  //Display functions ****************************************************************
-    float GetKp();                       // These functions query the pid for interal values.
-    float GetKi();                       //  they were created mainly for the pid front-end,
-    float GetKd();                       // where it's important to know what is actually 
-    int GetMode();                        //  inside the PID.
-    int GetDirection();                   //
-
-  private:
-    void Initialize();
+    /**
+     * Set how fast the PID loop is run.
+     *
+     * @param interval PID calculation peformed every interval seconds.
+     */
+    void setInterval(float interval);
     
-    float dispKp;              // * we'll hold on to the tuning parameters in user-entered 
-    float dispKi;              //   format for display purposes
-    float dispKd;              //
+    /**
+     * Set the set point.
+     *
+     * @param sp The set point as a real world value.
+     */
+    void setSetPoint(float sp);
     
-    float kp;                  // * (P)roportional Tuning Parameter
-    float ki;                  // * (I)ntegral Tuning Parameter
-    float kd;                  // * (D)erivative Tuning Parameter
+    /**
+     * Set the process value.
+     *
+     * @param pv The process value as a real world value.
+     */
+    void setProcessValue(float pv);
+    
+    /**
+     * Set the bias.
+     *
+     * @param bias The bias for the controller output.
+     */
+    void setBias(float bias);
 
-    int controllerDirection;
+    /**
+     * PID calculation.
+     *
+     * @return The controller output as a float between outMin and outMax.
+     */
+    float compute(void);
 
-    float *myInput;              // * Pointers to the Input, Output, and Setpoint variables
-    float *myOutput;             //   This creates a hard link between the variables and the 
-    float *mySetpoint;           //   PID, freeing the user from having to constantly tell us
-                                  //   what these values are.  with pointers we'll just know.
-              
-    unsigned long lastTime;
-    float ITerm, lastInput;
+    //Getters.
+    float getInMin();
+    float getInMax();
+    float getOutMin();
+    float getOutMax();
+    float getInterval();
+    float getPParam();
+    float getIParam();
+    float getDParam();
 
-    unsigned long SampleTime;
-    float outMin, outMax;
+private:
+
+    bool usingFeedForward;
     bool inAuto;
-};
-#endif
 
+    //Actual tuning parameters used in PID calculation.
+    float Kc_;
+    float tauR_;
+    float tauD_;
+    
+    //Raw tuning parameters.
+    float pParam_;
+    float iParam_;
+    float dParam_;
+    
+    //The point we want to reach.
+    float setPoint_;         
+    //The thing we measure.
+    float processVariable_;  
+    float prevProcessVariable_;
+    //The output that affects the process variable.
+    float controllerOutput_; 
+    float prevControllerOutput_;
+
+    //We work in % for calculations so these will scale from
+    //real world values to 0-100% and back again.
+    float inMin_;
+    float inMax_;
+    float inSpan_;
+    float outMin_;
+    float outMax_;
+    float outSpan_;
+
+    //The accumulated error, i.e. integral.
+    float accError_;
+    //The controller output bias.
+    float bias_;
+
+    //The interval between samples.
+    float tSample_;          
+
+    //Controller output as a real world value.
+    volatile float realOutput_;
+
+};
+
+#endif /* PID_H */
